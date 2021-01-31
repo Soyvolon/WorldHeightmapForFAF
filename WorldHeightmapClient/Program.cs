@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Windows.Forms;
 
+using Microsoft.Extensions.DependencyInjection;
+
+using WorldHeightmapClient.Popups;
+
+using WorldHeightmapCore.Services;
+
 namespace WorldHeightmapClient
 {
     static class Program
@@ -19,7 +25,21 @@ namespace WorldHeightmapClient
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new CoreForm());
+
+            ServiceCollection services = new();
+
+            ConfigureServices(services);
+
+            using var provider = services.BuildServiceProvider();
+
+            Application.Run(provider.GetRequiredService<CoreForm>());
+        }
+
+        private static void ConfigureServices(ServiceCollection services)
+        {
+            services.AddSingleton<CoreForm>()
+                .AddSingleton<HeightmapGeneratorService>()
+                .AddTransient<ApiKeyForm>();
         }
     }
 }

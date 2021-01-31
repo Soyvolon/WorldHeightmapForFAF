@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using WorldHeightmapClient.Popups;
 using WorldHeightmapClient.Properties;
 
@@ -12,21 +14,26 @@ namespace WorldHeightmapClient
         private void ElevationAPIKey_Click(object sender, EventArgs e)
          => SaveNewElevationApiKey();
 
-        private void SaveNewElevationApiKey()
+        private bool SaveNewElevationApiKey()
         {
-            using var popup = new ApiKeyForm();
+            var popup = _services.GetRequiredService<ApiKeyForm>();
 
             var diagResult = popup.ShowDialog(this);
             if (diagResult == DialogResult.Yes)
             {
                 Settings.Default.ApiKey = popup.GetApiKey();
+
+                Settings.Default.Save();
+                return true;
             }
             else if (diagResult == DialogResult.No)
             {
                 Settings.Default.ApiKey = "";
+
+                Settings.Default.Save();
             }
 
-            Settings.Default.Save();
+            return false;
         }
         #endregion
     }
