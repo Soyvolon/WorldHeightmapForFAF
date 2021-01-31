@@ -57,4 +57,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label3.Text" xml:space="preserve">
+    <value>Google gives you a free monthly $200 limit on their API services. That is 40,000 requests for free before you are charged any fees (As long as you are only using this API). Past that amount, the Elevation API costs money to use. Only create an API key if you understand this and are aware that any charges are your responsibility. The current pricing is $5.00 per 1k requests.</value>
+  </data>
 </root>
