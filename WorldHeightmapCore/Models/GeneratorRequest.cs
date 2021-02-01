@@ -4,10 +4,13 @@ namespace WorldHeightmapCore.Models
 {
     public class GeneratorRequest
     {
+        public string ApiKey { get; internal set; }
         public double Latitude { get; internal set; }
         public double Longitude { get; internal set; }
         public int Width { get; internal set; }
+        public int KilometerWidth { get; internal set; }
         public int Height { get; internal set; }
+        public int KilometerHeight { get; internal set; }
         public WaterType WaterOption { get; internal set; }
         public float WaterElevation { get; internal set; }
         public float DepthElevation { get; internal set; }

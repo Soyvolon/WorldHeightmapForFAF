@@ -52,6 +52,9 @@ namespace WorldHeightmapClient
             _heightmap = heightmap;
 
             InitializeComponent();
+
+            mapHeight.SelectedIndex = 3;
+            mapWidth.SelectedIndex = 3;
         }
 
         private async void GenerateButton_ClickAsync(object sender, System.EventArgs e)
@@ -65,15 +68,29 @@ namespace WorldHeightmapClient
                 }
             }
 
-            if(!double.TryParse(latitudeIn.Text, out var lat))
+            if(!GlobalPosition.TryParseDegrees(latitudeIn.Text, out var lat))
             {
-                MessageBox.Show("Invalid Latitude. Value must be in one of the following formats:\nDegrees", "Invalid Latitude", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Invalid Latitude. Value must be in one of the following formats:\nDegrees\n" +
+                    "Degrees-Minutes-Seconds-Hemesphere - Ex: 36°30'55.42\"W", "Invalid Latitude", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (!double.TryParse(longitudeIn.Text, out var lng))
+            if (!GlobalPosition.TryParseDegrees(longitudeIn.Text, out var lng))
             {
-                MessageBox.Show("Invalid Longitude. Value must be in one of the following formats:\nDegrees", "Invalid Longitude", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Invalid Longitude. Value must be in one of the following formats:\nDegrees\n" +
+                    "Degrees-Minutes-Seconds-Hemesphere - Ex: 36°30'55.42\"W", "Invalid Longitude", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if(mapWidth.SelectedItem is null)
+            {
+                MessageBox.Show("No map width selected.", "Invalid Map Width", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if(!heightSame.Checked && mapHeight.SelectedItem is null)
+            {
+                MessageBox.Show("No map height selected and height same is not checked.", "Invalid Map Height", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -83,7 +100,10 @@ namespace WorldHeightmapClient
             builder.WithLatitude(lat)
                 .WithLongitude(lng)
                 .WithWidht(GetSizeValue(mapWidth.SelectedIndex))
-                .WithHeight(heightSame.Checked ? builder.Width : GetSizeValue(mapHeight.SelectedIndex));
+                .WithKilometerWidth(GetKmValue(mapWidth.SelectedIndex))
+                .WithHeight(heightSame.Checked ? builder.Width : GetSizeValue(mapHeight.SelectedIndex))
+                .WithKilometerHeight(heightSame.Checked ? builder.KilometerWidth : GetKmValue(mapHeight.SelectedIndex))
+                .WithApiKey(Settings.Default.ApiKey);
 
             if (automaticWater.Checked)
                 builder.WithAutomaticWater();
@@ -122,6 +142,19 @@ namespace WorldHeightmapClient
                 _ => 0
             };
 
+        public static int GetKmValue(int index)
+            => index switch
+            {
+                0 => (int)1.25e3, 
+                1 => (int)2.5e3, 
+                2 => (int)5e3, 
+                3 => (int)10e3, 
+                4 => (int)20e3,
+                5 => (int)40e3,
+                6 => (int)80e3,
+                _ => 0
+            };
+
         public static float GetRoundToNearest(int index)
             => index switch
             {
@@ -131,5 +164,20 @@ namespace WorldHeightmapClient
                 _ => 0.25f
             };
 
+        private void HeightSame_CheckedChanged(object sender, EventArgs e)
+        {
+            if (heightSame.Checked)
+            {
+                mapHeight.Enabled = false;
+                MapWidth_SelectedIndexChanged(sender, e);
+            }
+            else mapHeight.Enabled = true;
+        }
+
+        private void MapWidth_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (heightSame.Checked)
+                mapHeight.SelectedIndex = mapWidth.SelectedIndex;
+        }
     }
 }

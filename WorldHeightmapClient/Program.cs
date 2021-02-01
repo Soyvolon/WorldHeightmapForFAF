@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using WorldHeightmapClient.Popups;
 
+using WorldHeightmapCore.Http;
 using WorldHeightmapCore.Services;
 
 namespace WorldHeightmapClient
@@ -40,6 +41,8 @@ namespace WorldHeightmapClient
             services.AddSingleton<CoreForm>()
                 .AddSingleton<HeightmapGeneratorService>()
                 .AddTransient<ApiKeyForm>();
+
+            services.AddHttpClient<ElevationClient>();
         }
     }
 }

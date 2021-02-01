@@ -6,10 +6,13 @@ namespace WorldHeightmapCore.Models
 {
     public class GeneratorRequestBuilder
     {
+        public string ApiKey { get; set; } = "";
         public double Latitude { get; set; } = 0;
         public double Longitude { get; set; } = 0;
         public int Width { get; set; } = 256;
+        public int KilometerWidth { get; set; } = 5000;
         public int Height { get; set; } = 256;
+        public int KilometerHeight { get; set; } = 5000;
         public WaterType WaterOption { get; set; } = WaterType.Automatic;
         public float WaterElevation { get; set; } = 0.0f;
         public float DepthElevation { get; set; } = 0.0f;
@@ -26,6 +29,12 @@ namespace WorldHeightmapCore.Models
         public GeneratorRequestBuilder()
         {
             
+        }
+
+        public GeneratorRequestBuilder WithApiKey(string apiKey)
+        {
+            ApiKey = apiKey;
+            return this;
         }
 
         public GeneratorRequestBuilder WithLatitude(double latitude)
@@ -46,9 +55,21 @@ namespace WorldHeightmapCore.Models
             return this;
         }
 
+        public GeneratorRequestBuilder WithKilometerWidth(int kilometerWidth)
+        {
+            KilometerWidth = kilometerWidth;
+            return this;
+        }
+
         public GeneratorRequestBuilder WithHeight(int height)
         {
             Height = height;
+            return this;
+        }
+
+        public GeneratorRequestBuilder WithKilometerHeight(int kilometerHeight)
+        {
+            KilometerHeight = kilometerHeight;
             return this;
         }
 
@@ -119,10 +140,13 @@ namespace WorldHeightmapCore.Models
         {
             return new GeneratorRequest()
             {
+                ApiKey = ApiKey,
                 Latitude = Latitude,
                 Longitude = Longitude,
                 Width = Width,
+                KilometerWidth = KilometerWidth,
                 Height = Height,
+                KilometerHeight = KilometerHeight,
                 WaterOption = WaterOption,
                 WaterElevation = WaterElevation,
                 DepthElevation = DepthElevation,

@@ -654,6 +654,7 @@ namespace WorldHeightmapClient
             this.heightSame.TabIndex = 7;
             this.heightSame.Text = "Same as Width";
             this.heightSame.UseVisualStyleBackColor = true;
+            this.heightSame.CheckedChanged += new System.EventHandler(this.HeightSame_CheckedChanged);
             // 
             // heighLabel
             // 
@@ -715,6 +716,7 @@ namespace WorldHeightmapClient
             this.mapWidth.Name = "mapWidth";
             this.mapWidth.Size = new System.Drawing.Size(119, 23);
             this.mapWidth.TabIndex = 1;
+            this.mapWidth.SelectedIndexChanged += new System.EventHandler(this.MapWidth_SelectedIndexChanged);
             // 
             // generateButton
             // 
