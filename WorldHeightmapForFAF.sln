@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. sln", "1. sln", "{6D660A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldHeightmapCore", "WorldHeightmapCore\WorldHeightmapCore.csproj", "{F03DCC7D-746D-4A81-B219-E5D1E2CD1856}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldHeightmapClient", "WorldHeightmapClient\WorldHeightmapClient.csproj", "{A5634D73-D3C8-4F01-8118-89F4E5E6C0B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldHeightmapClient", "WorldHeightmapClient\WorldHeightmapClient.csproj", "{A5634D73-D3C8-4F01-8118-89F4E5E6C0B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

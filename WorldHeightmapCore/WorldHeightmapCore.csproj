@@ -16,4 +16,19 @@
     <Folder Include="Logging\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\KingEdwardPoint_1025_1025.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\KingEdwardPoint_1025_1025.whcd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\KingEdwardPoint_65_65.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\KingEdwardPoint_65_65.whcd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

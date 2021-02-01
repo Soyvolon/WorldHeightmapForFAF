@@ -53,6 +53,18 @@ namespace WorldHeightmapCore.Models
             };
         }
 
+        public override int GetHashCode() => base.GetHashCode();
+
+        public bool RoughlyEquals(GlobalPosition? other, int decimalPoints)
+        {
+            if (other is null) return false;
+
+            return Equals(Math.Round(this.Latitude, decimalPoints),
+                    Math.Round(other.Latitude, decimalPoints))
+                && Equals(Math.Round(this.Longitude, decimalPoints),
+                    Math.Round(other.Longitude, decimalPoints));
+        }
+
         public override bool Equals(object? obj)
         {
             if (obj is GlobalPosition pos)

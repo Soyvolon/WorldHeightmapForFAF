@@ -23,6 +23,8 @@ namespace WorldHeightmapCore.Models
         public int AverageSmoothingPasses { get; internal set; }
         public float AverageSmoothingMaxDifference { get; internal set; }
         public float RoundSmoothingNearest { get; internal set; }
+        public bool ElevationData { get; internal set; }
+        public string DataFileLocation { get; internal set; }
     }
 
     public enum WaterType

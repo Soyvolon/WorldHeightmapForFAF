@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace WorldHeightmapCore.Models
@@ -25,6 +26,8 @@ namespace WorldHeightmapCore.Models
         public int AverageSmoothingPasses { get; set; } = 3;
         public float AverageSmoothingMaxDifference { get; set; } = 0.0035f;
         public float RoundSmoothingNearest { get; set; } = 0.50f;
+        public bool ElevationData { get; set; } = false;
+        public string DataFileLocation { get; set; } = "";
 
         public GeneratorRequestBuilder()
         {
@@ -136,6 +139,22 @@ namespace WorldHeightmapCore.Models
             return this;
         }
 
+        public GeneratorRequestBuilder WithElevationDataset(string datasetFile, string defaultFolder = "")
+        {
+            ElevationData = true;
+
+            var p = datasetFile;
+
+            if (!Path.IsPathFullyQualified(p))
+            {
+                p = defaultFolder + p;
+            }
+
+            DataFileLocation = p;
+
+            return this;
+        }
+
         public GeneratorRequest Build()
         {
             return new GeneratorRequest()
@@ -158,7 +177,9 @@ namespace WorldHeightmapCore.Models
                 SmoothingOptions = SmoothingOptions,
                 AverageSmoothingPasses = AverageSmoothingPasses,
                 AverageSmoothingMaxDifference = AverageSmoothingMaxDifference,
-                RoundSmoothingNearest = RoundSmoothingNearest
+                RoundSmoothingNearest = RoundSmoothingNearest,
+                ElevationData = ElevationData,
+                DataFileLocation = DataFileLocation
             };
         }
     }

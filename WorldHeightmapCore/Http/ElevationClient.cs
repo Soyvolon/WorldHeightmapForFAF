@@ -18,6 +18,8 @@ namespace WorldHeightmapCore.Http
 
         public const string URL_BASE = "https://maps.googleapis.com/maps/api/elevation/json?key=";
         public const int URL_MAX_LENGTH = 8192;
+        public const int MAX_POINTS_PER_REQUEST = 512;
+
         private string? ApiKey { get; set; }
 
         public ElevationClient(HttpClient client)
@@ -37,57 +39,47 @@ namespace WorldHeightmapCore.Http
             var requests = GetRequests(polyPoints);
 
             List<ElevationResponse?> responses = new();
-            List<Task> toAwait = new();
 
-            for(int i = 0; i < requests.Count; i++)
+            int i = 0;
+            while(requests.TryDequeue(out var request))
             {
-                toAwait.Add(Task.Run(async () =>
+                if (i++ > 0)
+                    await Task.Delay(TimeSpan.FromSeconds(.25));
+
+                try
                 {
-                    try
+                    var response = await _client.GetAsync(request);
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        if (requests.TryDequeue(out var request))
-                        {
-                            var response = await _client.GetAsync(request);
+                        var json = await response.Content.ReadAsStringAsync();
 
-                            if (response.IsSuccessStatusCode)
-                            {
-                                var json = await response.Content.ReadAsStringAsync();
+                        var obj = ElevationResponse.FromJson(json);
 
-                                var obj = ElevationResponse.FromJson(json);
-
-                                responses.Add(obj);
-                            }
-                            else
-                            {
-                                responses.Add(new()
-                                {
-                                    ErrorMessage = $"{response.StatusCode}: {response.ReasonPhrase}",
-                                    Status = "ERRORED"
-                                });
-                            }
-                        }
-                        else
-                        {
-                            responses.Add(new()
-                            {
-                                ErrorMessage = "Failed to remove a request from the Queue when there should have been one.",
-                                Status = "ERRORED"
-                            });
-                        }
+                        responses.Add(obj);
                     }
-                    catch (Exception ex)
+                    else
                     {
                         responses.Add(new()
                         {
-                            ErrorMessage = ex.Message,
-                            Status = "ERRORED"
+                            ErrorMessage = $"{response.StatusCode}: {response.ReasonPhrase}",
+                            Status = "CLIENT_ERRORED"
                         });
-                    }
-                }));
-            }
 
-            foreach (var task in toAwait)
-                await task;
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    responses.Add(new()
+                    {
+                        ErrorMessage = ex.Message,
+                        Status = "CLIENT_ERRORED"
+                    });
+
+                    break;
+                }
+            }
 
             List<ElevationResult> results = new();
 
@@ -111,17 +103,13 @@ namespace WorldHeightmapCore.Http
 
             double[,] elevation = new double[w, h];
 
+            int i = 0;
             for(int x = 0; x < w; x++)
             {
                 for(int y = 0; y < h; y++)
                 {
-                    var p = points[x, y];
-
-                    var res = results.FirstOrDefault(z => z.Location.Equals(p));
-
-                    if (res is null)
-                        throw new ElevationApiException("A returned point did not match a requested point.");
-
+                    var res = results[i++];
+                    // We assume the order is the same.
                     elevation[x, y] = res.Elevation;
                 }
             }
@@ -137,19 +125,21 @@ namespace WorldHeightmapCore.Http
 
             string current = baseUrl;
             GlobalPosition last = new();
+            int c = 0;
             foreach(var poly in polyPoints)
             {
                 string toAdd = ComputePolyline(poly, last);
-                last = poly;
 
-                if(current.Length + toAdd.Length > URL_MAX_LENGTH)
+                if(current.Length + toAdd.Length > URL_MAX_LENGTH || c++ >= MAX_POINTS_PER_REQUEST)
                 {
                     requests.Enqueue(current);
                     current = baseUrl;
                     last = new();
-                    toAdd += ComputePolyline(poly, last);
+                    c = 1;
+                    toAdd = ComputePolyline(poly, last);
                 }
 
+                last = poly;
                 current += toAdd;
             }
 
