@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using WorldHeightmapClient.Properties;
@@ -116,6 +118,43 @@ namespace WorldHeightmapClient
             return files;
         }
 
+        public async Task SaveDatasetAsync(string path, string name, GeneratorResult result)
+        {
+            var xw = result.RawElevationData.GetLength(0);
+            var yw = result.RawElevationData.GetLength(1);
+            string top = $"{name}, {xw}, {yw}";
+
+            List<string> dat = new();
+            for (int x = 0; x < xw; x++)
+                for (int y = 0; y < yw; y++)
+                    dat.Add(result.RawElevationData[x, y].ToString());
+
+            string[] file = new string[]
+            {
+                top,
+                string.Join(", ", dat)
+            };
+
+            await File.WriteAllLinesAsync(path, file);
+        }
+
+        public async Task SaveGeneratorResultsAsync(GeneratorResult result, string folder)
+        {
+
+            await File.WriteAllBytesAsync(Path.Join(folder, @"testoutput.raw"), result.Heightmap);
+
+            result.HeightmapBitmap.Save(Path.Join(folder, "testoutput.bmp"), ImageFormat.Bmp);
+
+            var xw = result.ModifedElevationData.GetLength(0);
+            var yw = result.ModifedElevationData.GetLength(1);
+            List<string> dat = new();
+            for (int x = 0; x < xw; x++)
+                for (int y = 0; y < yw; y++)
+                    dat.Add($"({x}, {y}): {result.ModifedElevationData[x, y]}");
+
+            await File.WriteAllLinesAsync(Path.Join(folder, "modified_elevation_data.txt"), dat);
+        }
+
         private async void GenerateButton_ClickAsync(object sender, System.EventArgs e)
         {
             var builder = new GeneratorRequestBuilder();
@@ -200,8 +239,15 @@ namespace WorldHeightmapClient
 
             var result = await _heightmap.GenerateHeightmap(builder.Build());
 
-            // TODO: hold data for later.
-            await File.WriteAllBytesAsync(@"Data\testoutput.raw", result.Heightmap);
+            await SaveDatasetAsync(Path.Join(USER_FILES, "Temp.whcd"), "[TEMP] Last Dataset Run", result);
+            await SaveGeneratorResultsAsync(result, "Data");
+
+            resultDisplay.Image = result.HeightmapBitmap;
+            resultDisplay.Refresh();
+
+            waterElevation.Value = (decimal)result.WaterHeight;
+            depthElevation.Value = (decimal)result.DepthHeight;
+            abyssElevation.Value = (decimal)result.AbyssHeight;
         }
 
         public static int GetSizeValue(int index)

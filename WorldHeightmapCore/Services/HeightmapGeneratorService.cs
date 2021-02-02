@@ -9,13 +9,16 @@ using WorldHeightmapCore.Http;
 using WorldHeightmapCore.Models;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace WorldHeightmapCore.Services
 {
     public class HeightmapGeneratorService
     {
         private readonly ElevationClient _elevation;
-        private const int BREAK_SQUISH_AFTER = 100;
+        private const int BreakSquishAfter = 100;
+        public const double HeightResize = 100; //32768.0; //512 * 40;
 
         public HeightmapGeneratorService(ElevationClient elevation)
             => _elevation = elevation;
@@ -63,7 +66,10 @@ namespace WorldHeightmapCore.Services
                 WaterHeight = water.Item1,
                 DepthHeight = water.Item2,
                 AbyssHeight = water.Item3,
-                Heightmap = heightmap
+                Heightmap = heightmap.Item1,
+                HeightmapBitmap = heightmap.Item2,
+                RawElevationData = elevationPoints,
+                ModifedElevationData = rotatedPoints
             };
         }
 
@@ -73,44 +79,79 @@ namespace WorldHeightmapCore.Services
             var yw = data.GetLength(1);
             var output = new double[xw, yw];
 
-            int xout = xw - 1;
-            int yout = 0;
+            int xout = 0;
+            int yout = yw - 1;
 
             for (int x = 0; x < xw; x++)
             {
                 for (int y = 0; y < yw; y++)
                 {
-                    output[xout--, yout] = data[x, y];
+                    output[xout, yout--] = data[x, y];
                 }
 
-                xout = xw - 1;
-                yout++;
+                xout++;
+                yout = yw - 1;
             }
 
             return output;
         }
 
-        private byte[] GetHeightmapByteArray(double[,] data, GeneratorRequest request)
+        private (byte[], Bitmap) GetHeightmapByteArray(double[,] data, GeneratorRequest request)
         {
-            byte[] bytes = new byte[request.Width * request.Height * 2];
+            //var stride = request.Width * 2;
+
+            //var end = stride % 4;
+
+            //while(end != 0)
+            //{
+            //    stride += 4 / end;
+            //    end = stride % 4;
+            //}
+            
+            byte[] bytes = new byte[data.Length * 2];
+
+            //var map = new Bitmap(request.Width, request.Height, PixelFormat.Format16bppRgb565);
+
+            //var bitdata = map.LockBits(new(0, 0, request.Width, request.Height), ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
 
             int bytecounter = 0;
-            for (int x = 0; x < data.GetLength(0); x++)
+            for (int y = 0; y < data.GetLength(1); y++)
             {
-                for (int y = 0; y < data.GetLength(1); y++)
+                for (int x = 0; x < data.GetLength(0); x++)
                 {
                     var point = data[x, y];
 
-                    var amnt = (int)Math.Round(point);
+                    var large = point * HeightResize;
 
-                    var b = (byte)(amnt / 2);
+                    if (large > ushort.MaxValue)
+                        throw new Exception();
 
-                    bytes[bytecounter++] = b;
-                    bytes[bytecounter++] = b;
+                    ushort value = Convert.ToUInt16(large);
+
+                    var bits = BitConverter.GetBytes(value);
+
+                    bytes[bytecounter++] = bits[0];
+                    bytes[bytecounter++] = bits[1];
                 }
             }
 
-            return bytes;
+            Bitmap bmp = new(request.Width, request.Height, PixelFormat.Format16bppRgb565);
+            // Lock the bits
+            Rectangle bounds = new(0, 0, request.Width, request.Height);
+            BitmapData bmpData = bmp.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
+            IntPtr ptrToFirstPixel = bmpData.Scan0;
+
+            byte[] buffer = new byte[request.Height * bmpData.Stride];
+
+            for (int y = 0; y < request.Height; y++)
+            {
+                Buffer.BlockCopy(bytes, y * request.Width * 2, buffer, y * bmpData.Stride, request.Width * 2);
+            }
+
+            Marshal.Copy(buffer, 0, ptrToFirstPixel, buffer.Length);
+            bmp.UnlockBits(bmpData);
+
+            return (bytes, bmp);
         }
 
         private (double, double, double) GetWaterHeights(double[,] sqished, double waterHeight)
@@ -218,7 +259,7 @@ namespace WorldHeightmapCore.Services
             int emergencybreak = 0;
             var below = GetBelowThreshold(data);
             while (below < squishPercentage
-                && emergencybreak++ < BREAK_SQUISH_AFTER)
+                && emergencybreak++ < BreakSquishAfter)
             {
                 var multipler = (1 - below) / 2;
 

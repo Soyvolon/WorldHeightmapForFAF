@@ -859,6 +859,7 @@ namespace WorldHeightmapClient
             this.resultDisplay.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.resultDisplay.Name = "resultDisplay";
             this.resultDisplay.Size = new System.Drawing.Size(429, 383);
+            this.resultDisplay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.resultDisplay.TabIndex = 0;
             this.resultDisplay.TabStop = false;
             // 

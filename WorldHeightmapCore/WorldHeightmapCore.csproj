@@ -30,6 +30,9 @@
     <None Update="Data\KingEdwardPoint_65_65.whcd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Data\PinchingBay_129_129.whcd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
