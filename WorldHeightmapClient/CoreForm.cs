@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -157,7 +158,7 @@ namespace WorldHeightmapClient
 
                 builder.WithLatitude(lat)
                     .WithLongitude(lng)
-                    .WithWidht(GetSizeValue(mapWidth.SelectedIndex))
+                    .WithWidth(GetSizeValue(mapWidth.SelectedIndex))
                     .WithKilometerWidth(GetKmValue(mapWidth.SelectedIndex))
                     .WithHeight(heightSame.Checked ? builder.Width : GetSizeValue(mapHeight.SelectedIndex))
                     .WithKilometerHeight(heightSame.Checked ? builder.KilometerWidth : GetKmValue(mapHeight.SelectedIndex))
@@ -165,23 +166,23 @@ namespace WorldHeightmapClient
             }
             else
             {
-                if(savedElevationBox.SelectedItem is null)
+                if (savedElevationBox.SelectedItem is not ElevationDataFile file)
                 {
                     MessageBox.Show("No saved elevation dataset selected.", "Invalid Elevation Dataset", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-
+                builder.WithElevationDataset(file.Path)
+                    .WithWidth(file.Width)
+                    .WithHeight(file.Height);
             }
 
             using var lockout = new ToolsLockout(this);
 
             if (automaticWater.Checked)
                 builder.WithAutomaticWater();
-            else if (noWater.Checked)
-                builder.WithNoWater();
-            else if (manualWater.Checked)
-                builder.WithManualWater((float)waterElevation.Value, (float)depthElevation.Value, (float)abyssElevation.Value);
+            else if (flattenWater.Checked)
+                builder.WithFlattenWater();
 
             if (noSquash.Checked)
                 builder.WithNoSquash();
@@ -197,7 +198,10 @@ namespace WorldHeightmapClient
             else if (averageSmoothing.Checked)
                 builder.WithAverageSmoothing((int)averagePasses.Value, (float)maxVertexDifference.Value);
 
-            await _heightmap.GenerateHeightmap(builder.Build());
+            var result = await _heightmap.GenerateHeightmap(builder.Build());
+
+            // TODO: hold data for later.
+            await File.WriteAllBytesAsync(@"Data\testoutput.raw", result.Heightmap);
         }
 
         public static int GetSizeValue(int index)

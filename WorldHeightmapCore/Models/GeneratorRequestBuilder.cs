@@ -15,9 +15,6 @@ namespace WorldHeightmapCore.Models
         public int Height { get; set; } = 256;
         public int KilometerHeight { get; set; } = 5000;
         public WaterType WaterOption { get; set; } = WaterType.Automatic;
-        public float WaterElevation { get; set; } = 0.0f;
-        public float DepthElevation { get; set; } = 0.0f;
-        public float AbyssElevation { get; set; } = 0.0f;
         public SquashType SquashOption { get; set; } = SquashType.Compress;
         public int SquashCompressPasses { get; set; } = 3;
         public int SquashFlattenMin { get; set; } = 5;
@@ -28,6 +25,7 @@ namespace WorldHeightmapCore.Models
         public float RoundSmoothingNearest { get; set; } = 0.50f;
         public bool ElevationData { get; set; } = false;
         public string DataFileLocation { get; set; } = "";
+        public int SquishPercent { get; set; } = 80;
 
         public GeneratorRequestBuilder()
         {
@@ -52,7 +50,7 @@ namespace WorldHeightmapCore.Models
             return this;
         }
 
-        public GeneratorRequestBuilder WithWidht(int width)
+        public GeneratorRequestBuilder WithWidth(int width)
         {
             Width = width;
             return this;
@@ -82,18 +80,9 @@ namespace WorldHeightmapCore.Models
             return this;
         }
 
-        public GeneratorRequestBuilder WithNoWater()
+        public GeneratorRequestBuilder WithFlattenWater()
         {
-            WaterOption = WaterType.None;
-            return this;
-        }
-
-        public GeneratorRequestBuilder WithManualWater(float water, float depth, float abyss)
-        {
-            WaterElevation = water;
-            DepthElevation = depth;
-            AbyssElevation = abyss;
-            WaterOption = WaterType.Manual;
+            WaterOption = WaterType.Flatten;
             return this;
         }
 
@@ -167,9 +156,6 @@ namespace WorldHeightmapCore.Models
                 Height = Height,
                 KilometerHeight = KilometerHeight,
                 WaterOption = WaterOption,
-                WaterElevation = WaterElevation,
-                DepthElevation = DepthElevation,
-                AbyssElevation = AbyssElevation,
                 SquashOption = SquashOption,
                 SquashCompressPasses = SquashCompressPasses,
                 SquashFlattenMin = SquashFlattenMin,
@@ -179,7 +165,8 @@ namespace WorldHeightmapCore.Models
                 AverageSmoothingMaxDifference = AverageSmoothingMaxDifference,
                 RoundSmoothingNearest = RoundSmoothingNearest,
                 ElevationData = ElevationData,
-                DataFileLocation = DataFileLocation
+                DataFileLocation = DataFileLocation,
+                SquishPercent = SquishPercent
             };
         }
     }

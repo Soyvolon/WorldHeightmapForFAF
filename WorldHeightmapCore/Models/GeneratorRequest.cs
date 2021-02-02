@@ -12,9 +12,6 @@ namespace WorldHeightmapCore.Models
         public int Height { get; internal set; }
         public int KilometerHeight { get; internal set; }
         public WaterType WaterOption { get; internal set; }
-        public float WaterElevation { get; internal set; }
-        public float DepthElevation { get; internal set; }
-        public float AbyssElevation { get; internal set; }
         public SquashType SquashOption { get; internal set; }
         public int SquashCompressPasses { get; internal set; }
         public int SquashFlattenMin { get; internal set; }
@@ -25,13 +22,13 @@ namespace WorldHeightmapCore.Models
         public float RoundSmoothingNearest { get; internal set; }
         public bool ElevationData { get; internal set; }
         public string DataFileLocation { get; internal set; }
+        public int SquishPercent { get; internal set; }
     }
 
     public enum WaterType
     {
-        Manual,
-        Automatic,
-        None
+        Flatten,
+        Automatic
     }
 
     public enum SquashType

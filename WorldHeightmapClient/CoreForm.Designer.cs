@@ -45,13 +45,6 @@ namespace WorldHeightmapClient
             this.mapHeight = new System.Windows.Forms.ComboBox();
             this.savedDataTab = new System.Windows.Forms.TabPage();
             this.savedElevationBox = new System.Windows.Forms.ListBox();
-            this.manualWaterBox = new System.Windows.Forms.GroupBox();
-            this.abyssElevation = new System.Windows.Forms.NumericUpDown();
-            this.depthElevationLabel = new System.Windows.Forms.Label();
-            this.depthElevation = new System.Windows.Forms.NumericUpDown();
-            this.abyssElevationLabel = new System.Windows.Forms.Label();
-            this.waterElevationLabel = new System.Windows.Forms.Label();
-            this.waterElevation = new System.Windows.Forms.NumericUpDown();
             this.roundSettings = new System.Windows.Forms.GroupBox();
             this.roundToNearest = new System.Windows.Forms.ComboBox();
             this.roundToNearestLabel = new System.Windows.Forms.Label();
@@ -73,14 +66,22 @@ namespace WorldHeightmapClient
             this.compressPassesLabel = new System.Windows.Forms.Label();
             this.compressPasses = new System.Windows.Forms.NumericUpDown();
             this.squashGroup = new System.Windows.Forms.GroupBox();
+            this.squishPercentLabel = new System.Windows.Forms.Label();
+            this.squishPercent = new System.Windows.Forms.NumericUpDown();
             this.noSquash = new System.Windows.Forms.RadioButton();
             this.flattenSquash = new System.Windows.Forms.RadioButton();
             this.compressSquash = new System.Windows.Forms.RadioButton();
             this.waterTypeSelection = new System.Windows.Forms.GroupBox();
-            this.noWater = new System.Windows.Forms.RadioButton();
             this.automaticWater = new System.Windows.Forms.RadioButton();
-            this.manualWater = new System.Windows.Forms.RadioButton();
+            this.flattenWater = new System.Windows.Forms.RadioButton();
             this.generateButton = new System.Windows.Forms.Button();
+            this.manualWaterBox = new System.Windows.Forms.GroupBox();
+            this.abyssElevation = new System.Windows.Forms.NumericUpDown();
+            this.depthElevationLabel = new System.Windows.Forms.Label();
+            this.depthElevation = new System.Windows.Forms.NumericUpDown();
+            this.abyssElevationLabel = new System.Windows.Forms.Label();
+            this.waterElevationLabel = new System.Windows.Forms.Label();
+            this.waterElevation = new System.Windows.Forms.NumericUpDown();
             this.operationHoldingPanel = new System.Windows.Forms.Panel();
             this.operationsPanel = new System.Windows.Forms.SplitContainer();
             this.resultSection = new System.Windows.Forms.SplitContainer();
@@ -96,10 +97,6 @@ namespace WorldHeightmapClient
             this.liveDataTab.SuspendLayout();
             this.globalPosition.SuspendLayout();
             this.savedDataTab.SuspendLayout();
-            this.manualWaterBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.abyssElevation)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.depthElevation)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.waterElevation)).BeginInit();
             this.roundSettings.SuspendLayout();
             this.averageSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.maxVertexDifference)).BeginInit();
@@ -111,7 +108,12 @@ namespace WorldHeightmapClient
             this.compressSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.compressPasses)).BeginInit();
             this.squashGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.squishPercent)).BeginInit();
             this.waterTypeSelection.SuspendLayout();
+            this.manualWaterBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.abyssElevation)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.depthElevation)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.waterElevation)).BeginInit();
             this.operationHoldingPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.operationsPanel)).BeginInit();
             this.operationsPanel.Panel1.SuspendLayout();
@@ -119,6 +121,7 @@ namespace WorldHeightmapClient
             this.operationsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.resultSection)).BeginInit();
             this.resultSection.Panel1.SuspendLayout();
+            this.resultSection.Panel2.SuspendLayout();
             this.resultSection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.resultDisplay)).BeginInit();
             this.statusBar.SuspendLayout();
@@ -129,7 +132,6 @@ namespace WorldHeightmapClient
             this.settingsBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.settingsBox.Controls.Add(this.dataTab);
-            this.settingsBox.Controls.Add(this.manualWaterBox);
             this.settingsBox.Controls.Add(this.roundSettings);
             this.settingsBox.Controls.Add(this.averageSettings);
             this.settingsBox.Controls.Add(this.smoothingOptionsBox);
@@ -142,7 +144,7 @@ namespace WorldHeightmapClient
             this.settingsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.settingsBox.Name = "settingsBox";
             this.settingsBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.settingsBox.Size = new System.Drawing.Size(382, 730);
+            this.settingsBox.Size = new System.Drawing.Size(382, 618);
             this.settingsBox.TabIndex = 0;
             this.settingsBox.TabStop = false;
             this.settingsBox.Text = "Settings";
@@ -333,87 +335,12 @@ namespace WorldHeightmapClient
             this.savedElevationBox.Size = new System.Drawing.Size(355, 136);
             this.savedElevationBox.TabIndex = 0;
             // 
-            // manualWaterBox
-            // 
-            this.manualWaterBox.Controls.Add(this.abyssElevation);
-            this.manualWaterBox.Controls.Add(this.depthElevationLabel);
-            this.manualWaterBox.Controls.Add(this.depthElevation);
-            this.manualWaterBox.Controls.Add(this.abyssElevationLabel);
-            this.manualWaterBox.Controls.Add(this.waterElevationLabel);
-            this.manualWaterBox.Controls.Add(this.waterElevation);
-            this.manualWaterBox.Enabled = false;
-            this.manualWaterBox.Location = new System.Drawing.Point(7, 253);
-            this.manualWaterBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.manualWaterBox.Name = "manualWaterBox";
-            this.manualWaterBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.manualWaterBox.Size = new System.Drawing.Size(366, 105);
-            this.manualWaterBox.TabIndex = 14;
-            this.manualWaterBox.TabStop = false;
-            this.manualWaterBox.Text = "Manual Water Options";
-            // 
-            // abyssElevation
-            // 
-            this.abyssElevation.DecimalPlaces = 2;
-            this.abyssElevation.Location = new System.Drawing.Point(217, 76);
-            this.abyssElevation.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.abyssElevation.Name = "abyssElevation";
-            this.abyssElevation.Size = new System.Drawing.Size(140, 23);
-            this.abyssElevation.TabIndex = 5;
-            // 
-            // depthElevationLabel
-            // 
-            this.depthElevationLabel.AutoSize = true;
-            this.depthElevationLabel.Location = new System.Drawing.Point(7, 52);
-            this.depthElevationLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.depthElevationLabel.Name = "depthElevationLabel";
-            this.depthElevationLabel.Size = new System.Drawing.Size(90, 15);
-            this.depthElevationLabel.TabIndex = 1;
-            this.depthElevationLabel.Text = "Depth Elevation";
-            // 
-            // depthElevation
-            // 
-            this.depthElevation.DecimalPlaces = 2;
-            this.depthElevation.Location = new System.Drawing.Point(217, 50);
-            this.depthElevation.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.depthElevation.Name = "depthElevation";
-            this.depthElevation.Size = new System.Drawing.Size(140, 23);
-            this.depthElevation.TabIndex = 4;
-            // 
-            // abyssElevationLabel
-            // 
-            this.abyssElevationLabel.AutoSize = true;
-            this.abyssElevationLabel.Location = new System.Drawing.Point(7, 78);
-            this.abyssElevationLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.abyssElevationLabel.Name = "abyssElevationLabel";
-            this.abyssElevationLabel.Size = new System.Drawing.Size(89, 15);
-            this.abyssElevationLabel.TabIndex = 2;
-            this.abyssElevationLabel.Text = "Abyss Elevation";
-            // 
-            // waterElevationLabel
-            // 
-            this.waterElevationLabel.AutoSize = true;
-            this.waterElevationLabel.Location = new System.Drawing.Point(7, 25);
-            this.waterElevationLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.waterElevationLabel.Name = "waterElevationLabel";
-            this.waterElevationLabel.Size = new System.Drawing.Size(89, 15);
-            this.waterElevationLabel.TabIndex = 0;
-            this.waterElevationLabel.Text = "Water Elevation";
-            // 
-            // waterElevation
-            // 
-            this.waterElevation.DecimalPlaces = 2;
-            this.waterElevation.Location = new System.Drawing.Point(217, 23);
-            this.waterElevation.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.waterElevation.Name = "waterElevation";
-            this.waterElevation.Size = new System.Drawing.Size(140, 23);
-            this.waterElevation.TabIndex = 3;
-            // 
             // roundSettings
             // 
             this.roundSettings.Controls.Add(this.roundToNearest);
             this.roundSettings.Controls.Add(this.roundToNearestLabel);
             this.roundSettings.Enabled = false;
-            this.roundSettings.Location = new System.Drawing.Point(174, 630);
+            this.roundSettings.Location = new System.Drawing.Point(174, 516);
             this.roundSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.roundSettings.Name = "roundSettings";
             this.roundSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -452,7 +379,7 @@ namespace WorldHeightmapClient
             this.averageSettings.Controls.Add(this.maxVertexDifference);
             this.averageSettings.Controls.Add(this.averagePassesLabel);
             this.averageSettings.Controls.Add(this.averagePasses);
-            this.averageSettings.Location = new System.Drawing.Point(174, 538);
+            this.averageSettings.Location = new System.Drawing.Point(174, 424);
             this.averageSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.averageSettings.Name = "averageSettings";
             this.averageSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -528,7 +455,7 @@ namespace WorldHeightmapClient
             this.smoothingOptionsBox.Controls.Add(this.noSmoothing);
             this.smoothingOptionsBox.Controls.Add(this.roundSmoothing);
             this.smoothingOptionsBox.Controls.Add(this.averageSmoothing);
-            this.smoothingOptionsBox.Location = new System.Drawing.Point(6, 538);
+            this.smoothingOptionsBox.Location = new System.Drawing.Point(6, 424);
             this.smoothingOptionsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.smoothingOptionsBox.Name = "smoothingOptionsBox";
             this.smoothingOptionsBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -539,7 +466,7 @@ namespace WorldHeightmapClient
             // 
             // noSmoothing
             // 
-            this.noSmoothing.Location = new System.Drawing.Point(6, 99);
+            this.noSmoothing.Location = new System.Drawing.Point(7, 98);
             this.noSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.noSmoothing.Name = "noSmoothing";
             this.noSmoothing.Size = new System.Drawing.Size(148, 28);
@@ -549,7 +476,7 @@ namespace WorldHeightmapClient
             // 
             // roundSmoothing
             // 
-            this.roundSmoothing.Location = new System.Drawing.Point(7, 65);
+            this.roundSmoothing.Location = new System.Drawing.Point(8, 64);
             this.roundSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.roundSmoothing.Name = "roundSmoothing";
             this.roundSmoothing.Size = new System.Drawing.Size(148, 28);
@@ -560,7 +487,7 @@ namespace WorldHeightmapClient
             // averageSmoothing
             // 
             this.averageSmoothing.Checked = true;
-            this.averageSmoothing.Location = new System.Drawing.Point(7, 30);
+            this.averageSmoothing.Location = new System.Drawing.Point(8, 30);
             this.averageSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.averageSmoothing.Name = "averageSmoothing";
             this.averageSmoothing.Size = new System.Drawing.Size(148, 28);
@@ -576,7 +503,7 @@ namespace WorldHeightmapClient
             this.flattenSettings.Controls.Add(this.minMapHeightLabel);
             this.flattenSettings.Controls.Add(this.flattenMin);
             this.flattenSettings.Enabled = false;
-            this.flattenSettings.Location = new System.Drawing.Point(174, 434);
+            this.flattenSettings.Location = new System.Drawing.Point(174, 320);
             this.flattenSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.flattenSettings.Name = "flattenSettings";
             this.flattenSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -603,7 +530,7 @@ namespace WorldHeightmapClient
             this.flattenMax.Size = new System.Drawing.Size(65, 23);
             this.flattenMax.TabIndex = 2;
             this.flattenMax.Value = new decimal(new int[] {
-            55,
+            50,
             0,
             0,
             0});
@@ -625,17 +552,12 @@ namespace WorldHeightmapClient
             this.flattenMin.Name = "flattenMin";
             this.flattenMin.Size = new System.Drawing.Size(65, 23);
             this.flattenMin.TabIndex = 0;
-            this.flattenMin.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
             // 
             // compressSettings
             // 
             this.compressSettings.Controls.Add(this.compressPassesLabel);
             this.compressSettings.Controls.Add(this.compressPasses);
-            this.compressSettings.Location = new System.Drawing.Point(174, 365);
+            this.compressSettings.Location = new System.Drawing.Point(174, 251);
             this.compressSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.compressSettings.Name = "compressSettings";
             this.compressSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -674,37 +596,67 @@ namespace WorldHeightmapClient
             // 
             // squashGroup
             // 
+            this.squashGroup.Controls.Add(this.squishPercentLabel);
+            this.squashGroup.Controls.Add(this.squishPercent);
             this.squashGroup.Controls.Add(this.noSquash);
             this.squashGroup.Controls.Add(this.flattenSquash);
             this.squashGroup.Controls.Add(this.compressSquash);
-            this.squashGroup.Location = new System.Drawing.Point(6, 365);
+            this.squashGroup.Location = new System.Drawing.Point(6, 251);
             this.squashGroup.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.squashGroup.Name = "squashGroup";
             this.squashGroup.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.squashGroup.Size = new System.Drawing.Size(161, 166);
             this.squashGroup.TabIndex = 9;
             this.squashGroup.TabStop = false;
-            this.squashGroup.Text = "Squash Type";
+            this.squashGroup.Text = "Squash Settings";
+            // 
+            // squishPercentLabel
+            // 
+            this.squishPercentLabel.AutoSize = true;
+            this.squishPercentLabel.Location = new System.Drawing.Point(7, 139);
+            this.squishPercentLabel.Name = "squishPercentLabel";
+            this.squishPercentLabel.Size = new System.Drawing.Size(83, 15);
+            this.squishPercentLabel.TabIndex = 4;
+            this.squishPercentLabel.Text = "Squish Until %";
+            // 
+            // squishPercent
+            // 
+            this.squishPercent.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.squishPercent.Location = new System.Drawing.Point(106, 137);
+            this.squishPercent.Name = "squishPercent";
+            this.squishPercent.Size = new System.Drawing.Size(48, 23);
+            this.squishPercent.TabIndex = 3;
+            this.squishPercent.Value = new decimal(new int[] {
+            80,
+            0,
+            0,
+            0});
             // 
             // noSquash
             // 
-            this.noSquash.Location = new System.Drawing.Point(7, 91);
+            this.noSquash.Location = new System.Drawing.Point(8, 90);
             this.noSquash.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.noSquash.Name = "noSquash";
             this.noSquash.Size = new System.Drawing.Size(148, 28);
             this.noSquash.TabIndex = 2;
             this.noSquash.Text = "None";
             this.noSquash.UseVisualStyleBackColor = true;
+            this.noSquash.CheckedChanged += new System.EventHandler(this.NoSquash_CheckedChanged);
             // 
             // flattenSquash
             // 
-            this.flattenSquash.Location = new System.Drawing.Point(8, 57);
+            this.flattenSquash.Location = new System.Drawing.Point(8, 56);
             this.flattenSquash.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.flattenSquash.Name = "flattenSquash";
             this.flattenSquash.Size = new System.Drawing.Size(148, 28);
             this.flattenSquash.TabIndex = 1;
             this.flattenSquash.Text = "Flatten";
             this.flattenSquash.UseVisualStyleBackColor = true;
+            this.flattenSquash.CheckedChanged += new System.EventHandler(this.FlattenSquash_CheckedChanged);
             // 
             // compressSquash
             // 
@@ -717,12 +669,12 @@ namespace WorldHeightmapClient
             this.compressSquash.TabStop = true;
             this.compressSquash.Text = "Compress";
             this.compressSquash.UseVisualStyleBackColor = true;
+            this.compressSquash.CheckedChanged += new System.EventHandler(this.CompressSquash_CheckedChanged);
             // 
             // waterTypeSelection
             // 
-            this.waterTypeSelection.Controls.Add(this.noWater);
             this.waterTypeSelection.Controls.Add(this.automaticWater);
-            this.waterTypeSelection.Controls.Add(this.manualWater);
+            this.waterTypeSelection.Controls.Add(this.flattenWater);
             this.waterTypeSelection.Location = new System.Drawing.Point(7, 198);
             this.waterTypeSelection.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.waterTypeSelection.Name = "waterTypeSelection";
@@ -731,17 +683,6 @@ namespace WorldHeightmapClient
             this.waterTypeSelection.TabIndex = 8;
             this.waterTypeSelection.TabStop = false;
             this.waterTypeSelection.Text = "Water";
-            // 
-            // noWater
-            // 
-            this.noWater.Location = new System.Drawing.Point(223, 21);
-            this.noWater.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.noWater.Name = "noWater";
-            this.noWater.Size = new System.Drawing.Size(93, 20);
-            this.noWater.TabIndex = 2;
-            this.noWater.Text = "None";
-            this.noWater.UseVisualStyleBackColor = true;
-            this.noWater.CheckedChanged += new System.EventHandler(this.NoWater_CheckedChanged);
             // 
             // automaticWater
             // 
@@ -754,24 +695,22 @@ namespace WorldHeightmapClient
             this.automaticWater.TabStop = true;
             this.automaticWater.Text = "Automatic";
             this.automaticWater.UseVisualStyleBackColor = true;
-            this.automaticWater.CheckedChanged += new System.EventHandler(this.AutomaticWater_CheckedChanged);
             // 
-            // manualWater
+            // flattenWater
             // 
-            this.manualWater.Location = new System.Drawing.Point(7, 21);
-            this.manualWater.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.manualWater.Name = "manualWater";
-            this.manualWater.Size = new System.Drawing.Size(75, 20);
-            this.manualWater.TabIndex = 0;
-            this.manualWater.Text = "Manual";
-            this.manualWater.UseVisualStyleBackColor = true;
-            this.manualWater.CheckedChanged += new System.EventHandler(this.ManualWater_CheckedChanged);
+            this.flattenWater.Location = new System.Drawing.Point(7, 21);
+            this.flattenWater.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.flattenWater.Name = "flattenWater";
+            this.flattenWater.Size = new System.Drawing.Size(75, 20);
+            this.flattenWater.TabIndex = 0;
+            this.flattenWater.Text = "Flatten";
+            this.flattenWater.UseVisualStyleBackColor = true;
             // 
             // generateButton
             // 
             this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.generateButton.Location = new System.Drawing.Point(6, 696);
+            this.generateButton.Location = new System.Drawing.Point(6, 584);
             this.generateButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.generateButton.Name = "generateButton";
             this.generateButton.Size = new System.Drawing.Size(369, 27);
@@ -779,6 +718,86 @@ namespace WorldHeightmapClient
             this.generateButton.Text = "Generate";
             this.generateButton.UseVisualStyleBackColor = true;
             this.generateButton.Click += new System.EventHandler(this.GenerateButton_ClickAsync);
+            // 
+            // manualWaterBox
+            // 
+            this.manualWaterBox.Controls.Add(this.abyssElevation);
+            this.manualWaterBox.Controls.Add(this.depthElevationLabel);
+            this.manualWaterBox.Controls.Add(this.depthElevation);
+            this.manualWaterBox.Controls.Add(this.abyssElevationLabel);
+            this.manualWaterBox.Controls.Add(this.waterElevationLabel);
+            this.manualWaterBox.Controls.Add(this.waterElevation);
+            this.manualWaterBox.Location = new System.Drawing.Point(16, 15);
+            this.manualWaterBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.manualWaterBox.Name = "manualWaterBox";
+            this.manualWaterBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.manualWaterBox.Size = new System.Drawing.Size(451, 105);
+            this.manualWaterBox.TabIndex = 14;
+            this.manualWaterBox.TabStop = false;
+            this.manualWaterBox.Text = "Generated Automatic Water Values";
+            // 
+            // abyssElevation
+            // 
+            this.abyssElevation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.abyssElevation.DecimalPlaces = 2;
+            this.abyssElevation.Location = new System.Drawing.Point(303, 76);
+            this.abyssElevation.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.abyssElevation.Name = "abyssElevation";
+            this.abyssElevation.ReadOnly = true;
+            this.abyssElevation.Size = new System.Drawing.Size(140, 23);
+            this.abyssElevation.TabIndex = 5;
+            // 
+            // depthElevationLabel
+            // 
+            this.depthElevationLabel.AutoSize = true;
+            this.depthElevationLabel.Location = new System.Drawing.Point(7, 52);
+            this.depthElevationLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.depthElevationLabel.Name = "depthElevationLabel";
+            this.depthElevationLabel.Size = new System.Drawing.Size(90, 15);
+            this.depthElevationLabel.TabIndex = 1;
+            this.depthElevationLabel.Text = "Depth Elevation";
+            // 
+            // depthElevation
+            // 
+            this.depthElevation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.depthElevation.DecimalPlaces = 2;
+            this.depthElevation.Location = new System.Drawing.Point(303, 50);
+            this.depthElevation.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.depthElevation.Name = "depthElevation";
+            this.depthElevation.ReadOnly = true;
+            this.depthElevation.Size = new System.Drawing.Size(140, 23);
+            this.depthElevation.TabIndex = 4;
+            // 
+            // abyssElevationLabel
+            // 
+            this.abyssElevationLabel.AutoSize = true;
+            this.abyssElevationLabel.Location = new System.Drawing.Point(7, 78);
+            this.abyssElevationLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.abyssElevationLabel.Name = "abyssElevationLabel";
+            this.abyssElevationLabel.Size = new System.Drawing.Size(89, 15);
+            this.abyssElevationLabel.TabIndex = 2;
+            this.abyssElevationLabel.Text = "Abyss Elevation";
+            // 
+            // waterElevationLabel
+            // 
+            this.waterElevationLabel.AutoSize = true;
+            this.waterElevationLabel.Location = new System.Drawing.Point(7, 25);
+            this.waterElevationLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.waterElevationLabel.Name = "waterElevationLabel";
+            this.waterElevationLabel.Size = new System.Drawing.Size(89, 15);
+            this.waterElevationLabel.TabIndex = 0;
+            this.waterElevationLabel.Text = "Water Elevation";
+            // 
+            // waterElevation
+            // 
+            this.waterElevation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.waterElevation.DecimalPlaces = 2;
+            this.waterElevation.Location = new System.Drawing.Point(303, 23);
+            this.waterElevation.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.waterElevation.Name = "waterElevation";
+            this.waterElevation.ReadOnly = true;
+            this.waterElevation.Size = new System.Drawing.Size(140, 23);
+            this.waterElevation.TabIndex = 3;
             // 
             // operationHoldingPanel
             // 
@@ -789,7 +808,7 @@ namespace WorldHeightmapClient
             this.operationHoldingPanel.Location = new System.Drawing.Point(402, 14);
             this.operationHoldingPanel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.operationHoldingPanel.Name = "operationHoldingPanel";
-            this.operationHoldingPanel.Size = new System.Drawing.Size(911, 730);
+            this.operationHoldingPanel.Size = new System.Drawing.Size(911, 618);
             this.operationHoldingPanel.TabIndex = 1;
             // 
             // operationsPanel
@@ -808,8 +827,8 @@ namespace WorldHeightmapClient
             // operationsPanel.Panel2
             // 
             this.operationsPanel.Panel2.Controls.Add(this.loggerView);
-            this.operationsPanel.Size = new System.Drawing.Size(911, 730);
-            this.operationsPanel.SplitterDistance = 455;
+            this.operationsPanel.Size = new System.Drawing.Size(911, 618);
+            this.operationsPanel.SplitterDistance = 385;
             this.operationsPanel.SplitterWidth = 9;
             this.operationsPanel.TabIndex = 0;
             // 
@@ -823,7 +842,11 @@ namespace WorldHeightmapClient
             // resultSection.Panel1
             // 
             this.resultSection.Panel1.Controls.Add(this.resultDisplay);
-            this.resultSection.Size = new System.Drawing.Size(909, 453);
+            // 
+            // resultSection.Panel2
+            // 
+            this.resultSection.Panel2.Controls.Add(this.manualWaterBox);
+            this.resultSection.Size = new System.Drawing.Size(909, 383);
             this.resultSection.SplitterDistance = 429;
             this.resultSection.SplitterWidth = 9;
             this.resultSection.TabIndex = 0;
@@ -835,7 +858,7 @@ namespace WorldHeightmapClient
             this.resultDisplay.Location = new System.Drawing.Point(0, 0);
             this.resultDisplay.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.resultDisplay.Name = "resultDisplay";
-            this.resultDisplay.Size = new System.Drawing.Size(429, 453);
+            this.resultDisplay.Size = new System.Drawing.Size(429, 383);
             this.resultDisplay.TabIndex = 0;
             this.resultDisplay.TabStop = false;
             // 
@@ -846,7 +869,7 @@ namespace WorldHeightmapClient
             this.loggerView.Location = new System.Drawing.Point(0, 0);
             this.loggerView.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.loggerView.Name = "loggerView";
-            this.loggerView.Size = new System.Drawing.Size(909, 264);
+            this.loggerView.Size = new System.Drawing.Size(909, 222);
             this.loggerView.TabIndex = 0;
             this.loggerView.UseCompatibleStateImageBehavior = false;
             // 
@@ -857,7 +880,7 @@ namespace WorldHeightmapClient
             this.globalStatus,
             this.groupStatusLabel,
             this.groupStatus});
-            this.statusBar.Location = new System.Drawing.Point(0, 748);
+            this.statusBar.Location = new System.Drawing.Point(0, 636);
             this.statusBar.Name = "statusBar";
             this.statusBar.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
             this.statusBar.Size = new System.Drawing.Size(1321, 24);
@@ -890,7 +913,7 @@ namespace WorldHeightmapClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1321, 772);
+            this.ClientSize = new System.Drawing.Size(1321, 660);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.operationHoldingPanel);
             this.Controls.Add(this.settingsBox);
@@ -904,11 +927,6 @@ namespace WorldHeightmapClient
             this.globalPosition.ResumeLayout(false);
             this.globalPosition.PerformLayout();
             this.savedDataTab.ResumeLayout(false);
-            this.manualWaterBox.ResumeLayout(false);
-            this.manualWaterBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.abyssElevation)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.depthElevation)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.waterElevation)).EndInit();
             this.roundSettings.ResumeLayout(false);
             this.roundSettings.PerformLayout();
             this.averageSettings.ResumeLayout(false);
@@ -924,13 +942,21 @@ namespace WorldHeightmapClient
             this.compressSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.compressPasses)).EndInit();
             this.squashGroup.ResumeLayout(false);
+            this.squashGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.squishPercent)).EndInit();
             this.waterTypeSelection.ResumeLayout(false);
+            this.manualWaterBox.ResumeLayout(false);
+            this.manualWaterBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.abyssElevation)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.depthElevation)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.waterElevation)).EndInit();
             this.operationHoldingPanel.ResumeLayout(false);
             this.operationsPanel.Panel1.ResumeLayout(false);
             this.operationsPanel.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.operationsPanel)).EndInit();
             this.operationsPanel.ResumeLayout(false);
             this.resultSection.Panel1.ResumeLayout(false);
+            this.resultSection.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.resultSection)).EndInit();
             this.resultSection.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.resultDisplay)).EndInit();
@@ -967,7 +993,7 @@ namespace WorldHeightmapClient
         private System.Windows.Forms.NumericUpDown abyssElevation;
         private System.Windows.Forms.NumericUpDown depthElevation;
         private System.Windows.Forms.GroupBox waterTypeSelection;
-        private System.Windows.Forms.RadioButton manualWater;
+        private System.Windows.Forms.RadioButton flattenWater;
         private System.Windows.Forms.RadioButton automaticWater;
         private System.Windows.Forms.GroupBox squashGroup;
         private System.Windows.Forms.RadioButton compressSquash;
@@ -993,7 +1019,6 @@ namespace WorldHeightmapClient
         private System.Windows.Forms.Label averageSmoothCapLabel;
         private System.Windows.Forms.NumericUpDown maxVertexDifference;
         private System.Windows.Forms.ComboBox roundToNearest;
-        private System.Windows.Forms.RadioButton noWater;
         private System.Windows.Forms.GroupBox globalPosition;
         private System.Windows.Forms.Label latitudeLabel;
         private System.Windows.Forms.TextBox latitudeIn;
@@ -1006,6 +1031,8 @@ namespace WorldHeightmapClient
         private System.Windows.Forms.TabPage liveDataTab;
         private System.Windows.Forms.TabPage savedDataTab;
         private System.Windows.Forms.ListBox savedElevationBox;
+        private System.Windows.Forms.NumericUpDown squishPercent;
+        private System.Windows.Forms.Label squishPercentLabel;
     }
 }
 
