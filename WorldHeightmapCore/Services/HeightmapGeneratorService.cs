@@ -17,11 +17,15 @@ namespace WorldHeightmapCore.Services
     public class HeightmapGeneratorService
     {
         private readonly ElevationClient _elevation;
+        private readonly EarthClient _earth;
         private const int BreakSquishAfter = 100;
         public const double HeightResize = 100; //32768.0; //512 * 40;
 
-        public HeightmapGeneratorService(ElevationClient elevation)
-            => _elevation = elevation;
+        public HeightmapGeneratorService(ElevationClient elevation, EarthClient earth)
+        {
+            _elevation = elevation;
+            _earth = earth;
+        }
 
         /// <summary>
         /// Generate a heightmap from a GeneratorRequest
@@ -59,6 +63,7 @@ namespace WorldHeightmapCore.Services
             var heightmap = GetHeightmapByteArray(rotatedPoints, request);
 
 
+            //SaveTestImage(elevationPoints, request);
 
             // TODO return real result
             return new()
@@ -96,6 +101,33 @@ namespace WorldHeightmapCore.Services
             return output;
         }
 
+        private void SaveTestImage(double[,] data, GeneratorRequest request)
+        {
+            Bitmap map = new(request.Width, request.Height);
+
+            for (int y = 0; y < data.GetLength(1); y++)
+            {
+                for (int x = 0; x < data.GetLength(0); x++)
+                {
+                    var point = data[x, y];
+
+                    var large = point;
+
+                    byte value;
+                    if (large < byte.MaxValue && large > byte.MinValue)
+                        value = Convert.ToByte(large);
+                    else if (large > byte.MinValue)
+                        value = byte.MaxValue;
+                    else
+                        value = byte.MinValue;
+
+                    map.SetPixel(x, y, Color.FromArgb(value, value, value));
+                }
+            }
+
+            map.Save(Path.Join("Data", "test_img.bmp"), ImageFormat.Bmp);
+        }
+
         private (byte[], Bitmap) GetHeightmapByteArray(double[,] data, GeneratorRequest request)
         {
             //var stride = request.Width * 2;
@@ -109,12 +141,12 @@ namespace WorldHeightmapCore.Services
             //}
             
             byte[] bytes = new byte[data.Length * 2];
-
+            using MemoryStream ms = new(bytes);
+            using BinaryWriter writer = new(ms);
             //var map = new Bitmap(request.Width, request.Height, PixelFormat.Format16bppRgb565);
 
             //var bitdata = map.LockBits(new(0, 0, request.Width, request.Height), ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
 
-            int bytecounter = 0;
             for (int y = 0; y < data.GetLength(1); y++)
             {
                 for (int x = 0; x < data.GetLength(0); x++)
@@ -123,15 +155,15 @@ namespace WorldHeightmapCore.Services
 
                     var large = point * HeightResize;
 
-                    if (large > ushort.MaxValue)
-                        throw new Exception();
+                    ushort value;
+                    if (large < ushort.MaxValue && large > ushort.MinValue)
+                        value = Convert.ToUInt16(large);
+                    else if (large > ushort.MinValue)
+                        value = ushort.MaxValue;
+                    else
+                        value = ushort.MinValue;
 
-                    ushort value = Convert.ToUInt16(large);
-
-                    var bits = BitConverter.GetBytes(value);
-
-                    bytes[bytecounter++] = bits[0];
-                    bytes[bytecounter++] = bits[1];
+                    writer.Write(BitConverter.GetBytes(value));
                 }
             }
 
@@ -417,7 +449,7 @@ namespace WorldHeightmapCore.Services
             using StreamReader sr = new(fs);
 
             // we dont want the first line.
-            _ = await sr.ReadLineAsync();
+             _ = await sr.ReadLineAsync();
             // the data is on the second line.
             var data = await sr.ReadLineAsync();
 

@@ -23,6 +23,7 @@ namespace WorldHeightmapCore.Models
         public bool ElevationData { get; internal set; }
         public string DataFileLocation { get; internal set; }
         public int SquishPercent { get; internal set; }
+        public bool EarthEngine { get; internal set; }
     }
 
     public enum WaterType

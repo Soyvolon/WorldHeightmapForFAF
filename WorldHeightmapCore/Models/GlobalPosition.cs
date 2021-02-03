@@ -59,10 +59,13 @@ namespace WorldHeightmapCore.Models
         {
             if (other is null) return false;
 
-            return Equals(Math.Round(this.Latitude, decimalPoints),
-                    Math.Round(other.Latitude, decimalPoints))
-                && Equals(Math.Round(this.Longitude, decimalPoints),
-                    Math.Round(other.Longitude, decimalPoints));
+            var tlat = Math.Round(this.Latitude, decimalPoints);
+            var tlng = Math.Round(this.Longitude, decimalPoints);
+
+            var olat = Math.Round(other.Latitude, decimalPoints);
+            var olng = Math.Round(other.Longitude, decimalPoints);
+
+            return tlat == olat && tlng == olng;
         }
 
         public override bool Equals(object? obj)

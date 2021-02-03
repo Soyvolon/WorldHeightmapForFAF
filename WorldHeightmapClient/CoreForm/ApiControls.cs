@@ -35,6 +35,31 @@ namespace WorldHeightmapClient
 
             return false;
         }
+
+        private void SetEarthEngineKey_Click(object sender, EventArgs e)
+            => SaveNewEarthEnginePrivateKey();
+
+        private bool SaveNewEarthEnginePrivateKey()
+        {
+            var popup = _services.GetRequiredService<EarthEngineForm>();
+
+            var diagResult = popup.ShowDialog(this);
+            if (diagResult == DialogResult.Yes)
+            {
+                Settings.Default.EarthEngineKey = popup.GetEngineKey();
+
+                Settings.Default.Save();
+                return true;
+            }
+            else if (diagResult == DialogResult.No)
+            {
+                Settings.Default.ApiKey = "";
+
+                Settings.Default.Save();
+            }
+
+            return false;
+        }
         #endregion
     }
 }

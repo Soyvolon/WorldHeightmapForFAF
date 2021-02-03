@@ -46,5 +46,17 @@ namespace WorldHeightmapClient.Properties {
                 this["UpgradeSettings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string EarthEngineKey {
+            get {
+                return ((string)(this["EarthEngineKey"]));
+            }
+            set {
+                this["EarthEngineKey"] = value;
+            }
+        }
     }
 }

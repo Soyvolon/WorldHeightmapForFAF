@@ -140,8 +140,12 @@ namespace WorldHeightmapClient
 
         public async Task SaveGeneratorResultsAsync(GeneratorResult result, string folder)
         {
+            using FileStream fs = new(Path.Join(folder, "testoutput.raw"), FileMode.Create, FileAccess.Write);
+            using BinaryWriter w = new(fs);
 
-            await File.WriteAllBytesAsync(Path.Join(folder, @"testoutput.raw"), result.Heightmap);
+            w.Write(result.Heightmap);
+
+            //await File.WriteAllBytesAsync(Path.Join(folder, @"testoutput.raw"), result.Heightmap);
 
             result.HeightmapBitmap.Save(Path.Join(folder, "testoutput.bmp"), ImageFormat.Bmp);
 
@@ -153,6 +157,13 @@ namespace WorldHeightmapClient
                     dat.Add($"({x}, {y}): {result.ModifedElevationData[x, y]}");
 
             await File.WriteAllLinesAsync(Path.Join(folder, "modified_elevation_data.txt"), dat);
+
+            dat = new();
+            for (int x = 0; x < xw; x++)
+                for (int y = 0; y < yw; y++)
+                    dat.Add($"({x}, {y}): {result.RawElevationData[x, y]}");
+
+            await File.WriteAllLinesAsync(Path.Join(folder, "raw_elevation_data.txt"), dat);
         }
 
         private async void GenerateButton_ClickAsync(object sender, System.EventArgs e)
@@ -160,13 +171,31 @@ namespace WorldHeightmapClient
             var builder = new GeneratorRequestBuilder();
             if (dataTab.SelectedIndex == 0)
             {
-                if (string.IsNullOrWhiteSpace(Settings.Default.ApiKey))
+                if (apiType.SelectedIndex == 0)
                 {
-                    if (!SaveNewElevationApiKey())
+                    if (string.IsNullOrWhiteSpace(Settings.Default.ApiKey))
                     {
-                        MessageBox.Show("No API Key was found. Please save a valid API key.", "No API Key", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        if (!SaveNewElevationApiKey())
+                        {
+                            MessageBox.Show("No API Key was found. Please save a valid API key.", "No API Key", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
                     }
+                    
+                    builder.WithApiKey(Settings.Default.ApiKey);
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(Settings.Default.EarthEngineKey))
+                    {
+                        if (!SaveNewEarthEnginePrivateKey())
+                        {
+                            MessageBox.Show("No Earth Engine Key was found. Please save a valid Earth Engine key.", "No Earth Engine Key", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+
+                    builder.WithEarthEngineKey(Settings.Default.EarthEngineKey);
                 }
 
                 if (!GlobalPosition.TryParseDegrees(latitudeIn.Text, out var lat))
@@ -200,8 +229,7 @@ namespace WorldHeightmapClient
                     .WithWidth(GetSizeValue(mapWidth.SelectedIndex))
                     .WithKilometerWidth(GetKmValue(mapWidth.SelectedIndex))
                     .WithHeight(heightSame.Checked ? builder.Width : GetSizeValue(mapHeight.SelectedIndex))
-                    .WithKilometerHeight(heightSame.Checked ? builder.KilometerWidth : GetKmValue(mapHeight.SelectedIndex))
-                    .WithApiKey(Settings.Default.ApiKey);
+                    .WithKilometerHeight(heightSame.Checked ? builder.KilometerWidth : GetKmValue(mapHeight.SelectedIndex));
             }
             else
             {

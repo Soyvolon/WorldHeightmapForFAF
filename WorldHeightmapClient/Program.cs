@@ -40,9 +40,11 @@ namespace WorldHeightmapClient
         {
             services.AddSingleton<CoreForm>()
                 .AddSingleton<HeightmapGeneratorService>()
-                .AddTransient<ApiKeyForm>();
+                .AddTransient<ApiKeyForm>()
+                .AddTransient<EarthEngineForm>();
 
             services.AddHttpClient<ElevationClient>();
+            services.AddHttpClient<EarthClient>();
         }
     }
 }

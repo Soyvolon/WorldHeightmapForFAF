@@ -26,6 +26,7 @@ namespace WorldHeightmapCore.Models
         public bool ElevationData { get; set; } = false;
         public string DataFileLocation { get; set; } = "";
         public int SquishPercent { get; set; } = 80;
+        public bool EarthEngine { get; set; } = false;
 
         public GeneratorRequestBuilder()
         {
@@ -35,6 +36,14 @@ namespace WorldHeightmapCore.Models
         public GeneratorRequestBuilder WithApiKey(string apiKey)
         {
             ApiKey = apiKey;
+            EarthEngine = false;
+            return this;
+        }
+
+        public GeneratorRequestBuilder WithEarthEngineKey(string eeKey)
+        {
+            ApiKey = eeKey;
+            EarthEngine = true;
             return this;
         }
 
@@ -166,7 +175,8 @@ namespace WorldHeightmapCore.Models
                 RoundSmoothingNearest = RoundSmoothingNearest,
                 ElevationData = ElevationData,
                 DataFileLocation = DataFileLocation,
-                SquishPercent = SquishPercent
+                SquishPercent = SquishPercent,
+                EarthEngine = EarthEngine
             };
         }
     }
