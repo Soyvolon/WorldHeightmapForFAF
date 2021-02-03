@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using WorldHeightmapCore.Extensions;
 
 namespace WorldHeightmapCore.Services
 {
@@ -51,7 +52,9 @@ namespace WorldHeightmapCore.Services
 
                 var globalPoints = GetElevationPoints(request);
 
-                elevationPoints = await _elevation.GetElevationData(globalPoints);
+                var roundedPoints = globalPoints.Round(5);
+
+                elevationPoints = await _elevation.GetElevationData(roundedPoints);
             }
 
             var heightmapPoints = ConvertElevationToHeightmapValues(elevationPoints, request, out var waterHeight);
@@ -62,10 +65,6 @@ namespace WorldHeightmapCore.Services
 
             var heightmap = GetHeightmapByteArray(rotatedPoints, request);
 
-
-            //SaveTestImage(elevationPoints, request);
-
-            // TODO return real result
             return new()
             {
                 WaterHeight = water.Item1,
@@ -99,33 +98,6 @@ namespace WorldHeightmapCore.Services
             }
 
             return output;
-        }
-
-        private void SaveTestImage(double[,] data, GeneratorRequest request)
-        {
-            Bitmap map = new(request.Width, request.Height);
-
-            for (int y = 0; y < data.GetLength(1); y++)
-            {
-                for (int x = 0; x < data.GetLength(0); x++)
-                {
-                    var point = data[x, y];
-
-                    var large = point;
-
-                    byte value;
-                    if (large < byte.MaxValue && large > byte.MinValue)
-                        value = Convert.ToByte(large);
-                    else if (large > byte.MinValue)
-                        value = byte.MaxValue;
-                    else
-                        value = byte.MinValue;
-
-                    map.SetPixel(x, y, Color.FromArgb(value, value, value));
-                }
-            }
-
-            map.Save(Path.Join("Data", "test_img.bmp"), ImageFormat.Bmp);
         }
 
         private (byte[], Bitmap) GetHeightmapByteArray(double[,] data, GeneratorRequest request)

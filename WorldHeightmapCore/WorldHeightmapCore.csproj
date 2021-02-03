@@ -36,6 +36,9 @@
     <None Update="Data\PinchingBay_129_129.whcd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Data\PulauGebeAndJu_2049_2049.whcd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

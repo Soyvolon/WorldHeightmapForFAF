@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -18,7 +19,7 @@ namespace WorldHeightmapCore.Http
 
         public const string URL_BASE = "https://maps.googleapis.com/maps/api/elevation/json?key=";
         public const int URL_MAX_LENGTH = 8192;
-        public const int MAX_POINTS_PER_REQUEST = 512;
+        public const int POINTS_PER_REQUEST = 512;
 
         private string? ApiKey { get; set; }
 
@@ -130,7 +131,7 @@ namespace WorldHeightmapCore.Http
             {
                 string toAdd = ComputePolyline(poly, last);
 
-                if(current.Length + toAdd.Length > URL_MAX_LENGTH || c++ >= MAX_POINTS_PER_REQUEST)
+                if(current.Length + toAdd.Length > URL_MAX_LENGTH || c++ >= POINTS_PER_REQUEST)
                 {
                     requests.Enqueue(current);
                     current = baseUrl;

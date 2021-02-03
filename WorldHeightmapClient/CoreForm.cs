@@ -138,7 +138,7 @@ namespace WorldHeightmapClient
             await File.WriteAllLinesAsync(path, file);
         }
 
-        public async Task SaveGeneratorResultsAsync(GeneratorResult result, string folder)
+        public static async Task SaveGeneratorResultsAsync(GeneratorResult result, string folder)
         {
             using FileStream fs = new(Path.Join(folder, "testoutput.raw"), FileMode.Create, FileAccess.Write);
             using BinaryWriter w = new(fs);
@@ -171,31 +171,13 @@ namespace WorldHeightmapClient
             var builder = new GeneratorRequestBuilder();
             if (dataTab.SelectedIndex == 0)
             {
-                if (apiType.SelectedIndex == 0)
+                if (string.IsNullOrWhiteSpace(Settings.Default.ApiKey))
                 {
-                    if (string.IsNullOrWhiteSpace(Settings.Default.ApiKey))
+                    if (!SaveNewElevationApiKey())
                     {
-                        if (!SaveNewElevationApiKey())
-                        {
-                            MessageBox.Show("No API Key was found. Please save a valid API key.", "No API Key", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
+                        MessageBox.Show("No API Key was found. Please save a valid API key.", "No API Key", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
                     }
-                    
-                    builder.WithApiKey(Settings.Default.ApiKey);
-                }
-                else
-                {
-                    if (string.IsNullOrWhiteSpace(Settings.Default.EarthEngineKey))
-                    {
-                        if (!SaveNewEarthEnginePrivateKey())
-                        {
-                            MessageBox.Show("No Earth Engine Key was found. Please save a valid Earth Engine key.", "No Earth Engine Key", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-                    }
-
-                    builder.WithEarthEngineKey(Settings.Default.EarthEngineKey);
                 }
 
                 if (!GlobalPosition.TryParseDegrees(latitudeIn.Text, out var lat))
@@ -224,7 +206,8 @@ namespace WorldHeightmapClient
                     return;
                 }
 
-                builder.WithLatitude(lat)
+                builder.WithApiKey(Settings.Default.ApiKey)
+                    .WithLatitude(lat)
                     .WithLongitude(lng)
                     .WithWidth(GetSizeValue(mapWidth.SelectedIndex))
                     .WithKilometerWidth(GetKmValue(mapWidth.SelectedIndex))
