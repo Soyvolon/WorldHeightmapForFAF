@@ -6,13 +6,13 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using WorldHeightmapClient.Properties;
+using WorldHeightmap.Client.Properties;
 
 using WorldHeightmapCore.Data;
 using WorldHeightmapCore.Models;
 using WorldHeightmapCore.Services;
 
-namespace WorldHeightmapClient
+namespace WorldHeightmap.Client
 {
     public partial class CoreForm : Form
     {

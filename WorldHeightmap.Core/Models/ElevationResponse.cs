@@ -17,7 +17,7 @@ namespace WorldHeightmapCore.Models
         public string Status { get; set; }
 
         [JsonProperty("error_message")]
-        public string? ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
     public partial class ElevationResult
@@ -34,7 +34,7 @@ namespace WorldHeightmapCore.Models
 
     public partial class ElevationResponse
     {
-        public static ElevationResponse? FromJson(string json) => JsonConvert.DeserializeObject<ElevationResponse>(json, ElevationConverter.Settings);
+        public static ElevationResponse FromJson(string json) => JsonConvert.DeserializeObject<ElevationResponse>(json, ElevationConverter.Settings);
     }
 
     public static class Serialize

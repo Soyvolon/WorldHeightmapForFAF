@@ -55,7 +55,7 @@ namespace WorldHeightmapCore.Models
 
         public override int GetHashCode() => base.GetHashCode();
 
-        public bool RoughlyEquals(GlobalPosition? other, int decimalPoints)
+        public bool RoughlyEquals(GlobalPosition other, int decimalPoints)
         {
             if (other is null) return false;
 
@@ -68,14 +68,14 @@ namespace WorldHeightmapCore.Models
             return tlat == olat && tlng == olng;
         }
 
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             if (obj is GlobalPosition pos)
                 return Equals(pos);
             else return false;
         }
 
-        public bool Equals(GlobalPosition? other)
+        public bool Equals(GlobalPosition other)
         {
             if (other is null) return false;
 
@@ -84,10 +84,10 @@ namespace WorldHeightmapCore.Models
         }
 
         public static GlobalPosition operator +(GlobalPosition a, GlobalPosition b)
-            => new() { Latitude = a.Latitude + b.Latitude, Longitude = a.Longitude + b.Longitude };
+            => new GlobalPosition() { Latitude = a.Latitude + b.Latitude, Longitude = a.Longitude + b.Longitude };
 
         public static GlobalPosition operator -(GlobalPosition a, GlobalPosition b)
-            => new() { Latitude = a.Latitude - b.Latitude, Longitude = a.Longitude - b.Longitude };
+            => new GlobalPosition() { Latitude = a.Latitude - b.Latitude, Longitude = a.Longitude - b.Longitude };
 
         public static double ToDegrees(double val)
             => (val * 180) / Math.PI;
@@ -95,7 +95,7 @@ namespace WorldHeightmapCore.Models
         public static double ToRadians(double val)
             => (val * Math.PI) / 180;
 
-        public static bool TryParseDegrees(string value, [NotNullWhen(true)] out double degrees)
+        public static bool TryParseDegrees(string value, out double degrees)
         {
             if (double.TryParse(value, out degrees))
                 return true;
@@ -137,14 +137,14 @@ namespace WorldHeightmapCore.Models
             }
 
             value = value.Trim().ToUpper();
-            bool positive = value switch
+            bool positive = true;
+            switch (value)
             {
-                "N" => true,
-                "W" => false,
-                "S" => false,
-                "E" => true,
-                _ => true
-            };
+                case "N": positive = true; break;
+                case "W": positive = false; break;
+                case "S": positive = false; break;
+                case "E": positive = true; break;
+            }
 
             if (!positive)
                 degrees *= -1;

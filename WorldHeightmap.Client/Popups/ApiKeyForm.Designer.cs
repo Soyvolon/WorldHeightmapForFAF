@@ -1,5 +1,5 @@
 ﻿
-namespace WorldHeightmapClient.Popups
+namespace WorldHeightmap.Client.Popups
 {
     partial class ApiKeyForm
     {

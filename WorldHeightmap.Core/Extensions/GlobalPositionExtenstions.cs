@@ -18,7 +18,7 @@ namespace WorldHeightmapCore.Extensions
 
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
-                    output[x, y] = new()
+                    output[x, y] = new GlobalPosition()
                     {
                         Latitude = Math.Round(dat[x, y].Latitude, decimalPlaces),
                         Longitude = Math.Round(dat[x, y].Longitude, decimalPlaces)

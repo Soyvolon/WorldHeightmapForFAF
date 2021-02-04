@@ -149,7 +149,7 @@ namespace WorldHeightmapCore.Models
 
             var p = datasetFile;
 
-            if (!Path.IsPathFullyQualified(p))
+            if (!Path.IsPathRooted(p))
             {
                 p = defaultFolder + p;
             }

@@ -18,23 +18,20 @@ namespace WorldHeightmapCore.Services
     public class HeightmapGeneratorService
     {
         private readonly ElevationClient _elevation;
-        private readonly EarthClient _earth;
         private const int BreakSquishAfter = 100;
         public const double HeightResize = 100; //32768.0; //512 * 40;
 
-        public HeightmapGeneratorService(ElevationClient elevation, EarthClient earth)
+        public HeightmapGeneratorService(ElevationClient elevation)
         {
             _elevation = elevation;
-            _earth = earth;
         }
 
         /// <summary>
-        /// Generate a heightmap from a GeneratorRequest
+        /// Generate a heightmap from the details provided in the GeneratorRequest
         /// </summary>
-        /// <param name="request">A request to make the heightmap based off of.</param>
-        /// <param name="apiKey">The Google Elevation API key</param>
-        /// <returns>A MemoryStream of the raw heightmap file</returns>
-        public async Task<GeneratorResult?> GenerateHeightmap(GeneratorRequest request)
+        /// <param name="request">A request to build a heightmap from</param>
+        /// <returns>A GeneratorResult that contains the generated heightmap information, or null if no map was generated</returns>
+        public async Task<GeneratorResult> GenerateHeightmap(GeneratorRequest request)
         {
             double[,] elevationPoints;
             if (request.ElevationData)
@@ -73,7 +70,7 @@ namespace WorldHeightmapCore.Services
 
             var heightmap = GetHeightmapByteArray(rotatedPoints, request);
 
-            return new()
+            return new GeneratorResult()
             {
                 WaterHeight = water.Item1,
                 DepthHeight = water.Item2,
@@ -146,7 +143,7 @@ namespace WorldHeightmapCore.Services
 
         private double AverageDistanceFromCenter(double[,] data)
         {
-            List<double> distances = new();
+            List<double> distances = new List<double>();
             var center = data[data.GetLength(0) / 2, data.GetLength(1) / 2];
             for (int x = 0; x < data.GetLength(0); x++)
             {
@@ -268,49 +265,53 @@ namespace WorldHeightmapCore.Services
             //}
             
             byte[] bytes = new byte[data.Length * 2];
-            using MemoryStream ms = new(bytes);
-            using BinaryWriter writer = new(ms);
-            //var map = new Bitmap(request.Width, request.Height, PixelFormat.Format16bppRgb565);
-
-            //var bitdata = map.LockBits(new(0, 0, request.Width, request.Height), ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
-
-            for (int y = 0; y < data.GetLength(1); y++)
+            using (MemoryStream ms = new MemoryStream(bytes))
             {
-                for (int x = 0; x < data.GetLength(0); x++)
+                using (BinaryWriter writer = new BinaryWriter(ms))
                 {
-                    var point = data[x, y];
+                    //var map = new Bitmap(request.Width, request.Height, PixelFormat.Format16bppRgb565);
 
-                    var large = point * HeightResize;
+                    //var bitdata = map.LockBits(new(0, 0, request.Width, request.Height), ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
 
-                    ushort value;
-                    if (large < ushort.MaxValue && large > ushort.MinValue)
-                        value = Convert.ToUInt16(large);
-                    else if (large > ushort.MinValue)
-                        value = ushort.MaxValue;
-                    else
-                        value = ushort.MinValue;
+                    for (int y = 0; y < data.GetLength(1); y++)
+                    {
+                        for (int x = 0; x < data.GetLength(0); x++)
+                        {
+                            var point = data[x, y];
 
-                    writer.Write(BitConverter.GetBytes(value));
+                            var large = point * HeightResize;
+
+                            ushort value;
+                            if (large < ushort.MaxValue && large > ushort.MinValue)
+                                value = Convert.ToUInt16(large);
+                            else if (large > ushort.MinValue)
+                                value = ushort.MaxValue;
+                            else
+                                value = ushort.MinValue;
+
+                            writer.Write(BitConverter.GetBytes(value));
+                        }
+                    }
+
+                    Bitmap bmp = new Bitmap(request.Width, request.Height, PixelFormat.Format16bppRgb565);
+                    // Lock the bits
+                    Rectangle bounds = new Rectangle(0, 0, request.Width, request.Height);
+                    BitmapData bmpData = bmp.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
+                    IntPtr ptrToFirstPixel = bmpData.Scan0;
+
+                    byte[] buffer = new byte[request.Height * bmpData.Stride];
+
+                    for (int y = 0; y < request.Height; y++)
+                    {
+                        Buffer.BlockCopy(bytes, y * request.Width * 2, buffer, y * bmpData.Stride, request.Width * 2);
+                    }
+
+                    Marshal.Copy(buffer, 0, ptrToFirstPixel, buffer.Length);
+                    bmp.UnlockBits(bmpData);
+
+                    return (bytes, bmp);
                 }
             }
-
-            Bitmap bmp = new(request.Width, request.Height, PixelFormat.Format16bppRgb565);
-            // Lock the bits
-            Rectangle bounds = new(0, 0, request.Width, request.Height);
-            BitmapData bmpData = bmp.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
-            IntPtr ptrToFirstPixel = bmpData.Scan0;
-
-            byte[] buffer = new byte[request.Height * bmpData.Stride];
-
-            for (int y = 0; y < request.Height; y++)
-            {
-                Buffer.BlockCopy(bytes, y * request.Width * 2, buffer, y * bmpData.Stride, request.Width * 2);
-            }
-
-            Marshal.Copy(buffer, 0, ptrToFirstPixel, buffer.Length);
-            bmp.UnlockBits(bmpData);
-
-            return (bytes, bmp);
         }
 
         private (double, double, double) GetWaterHeights(double[,] sqished, double waterHeight)
@@ -570,15 +571,20 @@ namespace WorldHeightmapCore.Services
             return average;
         }
 
-        private async Task<double[,]?> ReadElevationDatasetAsync(string file, int width, int height)
+        private async Task<double[,]> ReadElevationDatasetAsync(string file, int width, int height)
         {
-            using FileStream fs = new(file, FileMode.Open);
-            using StreamReader sr = new(fs);
+            string data;
+            using (FileStream fs = new FileStream(file, FileMode.Open))
+            {
+                using (StreamReader sr = new StreamReader(fs))
+                {
 
-            // we dont want the first line.
-             _ = await sr.ReadLineAsync();
-            // the data is on the second line.
-            var data = await sr.ReadLineAsync();
+                    // we dont want the first line.
+                    _ = await sr.ReadLineAsync();
+                    // the data is on the second line.
+                    data = await sr.ReadLineAsync();
+                }
+            }
 
             if (data is null)
             {
@@ -586,7 +592,7 @@ namespace WorldHeightmapCore.Services
                 return null;
             }
 
-            var parts = data.Split(",");
+            var parts = data.Split(',');
 
             double[,] output = new double[width, height];
 
@@ -657,7 +663,7 @@ namespace WorldHeightmapCore.Services
                 int yc = 0;
                 for(int y = -halfHeight; y <= halfHeight; y++)
                 {
-                    tree[xc, yc++] = new()
+                    tree[xc, yc++] = new GlobalPosition()
                     {
                         Latitude = y * ySplit,
                         Longitude = x * xSplit
@@ -676,7 +682,7 @@ namespace WorldHeightmapCore.Services
             var top = initial.Displace(0, realHeight / 2);
             GlobalPosition left;
             if (realWidth == realHeight)
-                left = new()
+                left = new GlobalPosition()
                 {
                     Latitude = initial.Latitude,
                     Longitude = initial.Longitude + (top.Latitude - initial.Latitude)

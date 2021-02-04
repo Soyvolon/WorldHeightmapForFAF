@@ -1,5 +1,5 @@
 ﻿
-namespace WorldHeightmapClient
+namespace WorldHeightmap.Client
 {
     partial class CoreForm
     {

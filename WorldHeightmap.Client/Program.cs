@@ -3,12 +3,12 @@ using System.Windows.Forms;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using WorldHeightmapClient.Popups;
+using WorldHeightmap.Client.Popups;
 
 using WorldHeightmapCore.Http;
 using WorldHeightmapCore.Services;
 
-namespace WorldHeightmapClient
+namespace WorldHeightmap.Client
 {
     static class Program
     {
@@ -44,7 +44,6 @@ namespace WorldHeightmapClient
                 .AddTransient<EarthEngineForm>();
 
             services.AddHttpClient<ElevationClient>();
-            services.AddHttpClient<EarthClient>();
         }
     }
 }

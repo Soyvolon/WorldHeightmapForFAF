@@ -21,7 +21,7 @@ namespace WorldHeightmapCore.Http
         public const int URL_MAX_LENGTH = 8192;
         public const int POINTS_PER_REQUEST = 512;
 
-        private string? ApiKey { get; set; }
+        private string ApiKey { get; set; }
 
         public ElevationClient(HttpClient client)
         {
@@ -39,7 +39,7 @@ namespace WorldHeightmapCore.Http
 
             var requests = GetRequests(polyPoints);
 
-            List<ElevationResponse?> responses = new();
+            List<ElevationResponse> responses = new List<ElevationResponse>();
 
             int i = 0;
             while(requests.TryDequeue(out var request))
@@ -61,7 +61,7 @@ namespace WorldHeightmapCore.Http
                     }
                     else
                     {
-                        responses.Add(new()
+                        responses.Add(new ElevationResponse()
                         {
                             ErrorMessage = $"{response.StatusCode}: {response.ReasonPhrase}",
                             Status = "CLIENT_ERRORED"
@@ -72,7 +72,7 @@ namespace WorldHeightmapCore.Http
                 }
                 catch (Exception ex)
                 {
-                    responses.Add(new()
+                    responses.Add(new ElevationResponse()
                     {
                         ErrorMessage = ex.Message,
                         Status = "CLIENT_ERRORED"
@@ -82,7 +82,7 @@ namespace WorldHeightmapCore.Http
                 }
             }
 
-            List<ElevationResult> results = new();
+            List<ElevationResult> results = new List<ElevationResult>();
 
             foreach (var r in responses)
             {
@@ -122,10 +122,10 @@ namespace WorldHeightmapCore.Http
         {
             var baseUrl = URL_BASE + ApiKey + "&locations=enc:";
 
-            ConcurrentQueue<string> requests = new();
+            ConcurrentQueue<string> requests = new ConcurrentQueue<string>();
 
             string current = baseUrl;
-            GlobalPosition last = new();
+            GlobalPosition last = new GlobalPosition();
             int c = 0;
             foreach(var poly in polyPoints)
             {
@@ -135,7 +135,7 @@ namespace WorldHeightmapCore.Http
                 {
                     requests.Enqueue(current);
                     current = baseUrl;
-                    last = new();
+                    last = new GlobalPosition();
                     c = 1;
                     toAdd = ComputePolyline(poly, last);
                 }
@@ -151,7 +151,7 @@ namespace WorldHeightmapCore.Http
 
         private List<GlobalPosition> GetPolylinePoints(GlobalPosition[,] points)
         {
-            List<GlobalPosition> polyPoints = new();
+            List<GlobalPosition> polyPoints = new List<GlobalPosition>();
             for (int x = 0; x < points.GetLength(0); x++)
                 for (int y = 0; y < points.GetLength(1); y++)
                     polyPoints.Add(points[x, y]);
@@ -166,12 +166,12 @@ namespace WorldHeightmapCore.Http
     public class NotInitializedException : Exception
     {
         public NotInitializedException() : base() { }
-        public NotInitializedException(string? message) : base(message) { }
+        public NotInitializedException(string message) : base(message) { }
     }
 
     public class ElevationApiException : Exception
     {
         public ElevationApiException() : base() { }
-        public ElevationApiException(string? message) : base(message) { }
+        public ElevationApiException(string message) : base(message) { }
     }
 }

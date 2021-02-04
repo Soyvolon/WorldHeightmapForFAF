@@ -1,8 +1,8 @@
 ﻿using System.Windows.Forms;
 
-using WorldHeightmapClient.Properties;
+using WorldHeightmap.Client.Properties;
 
-namespace WorldHeightmapClient.Popups
+namespace WorldHeightmap.Client.Popups
 {
     public partial class ApiKeyForm : Form
     {

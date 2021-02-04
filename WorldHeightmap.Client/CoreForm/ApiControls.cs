@@ -3,10 +3,10 @@ using System.Windows.Forms;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using WorldHeightmapClient.Popups;
-using WorldHeightmapClient.Properties;
+using WorldHeightmap.Client.Popups;
+using WorldHeightmap.Client.Properties;
 
-namespace WorldHeightmapClient
+namespace WorldHeightmap.Client
 {
     public partial class CoreForm
     {

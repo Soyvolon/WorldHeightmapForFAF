@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorldHeightmapClient
+namespace WorldHeightmap.Client
 {
     public partial class CoreForm
     {
