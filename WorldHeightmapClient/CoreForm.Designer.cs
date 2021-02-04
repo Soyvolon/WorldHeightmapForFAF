@@ -46,7 +46,6 @@ namespace WorldHeightmapClient
             this.savedDataTab = new System.Windows.Forms.TabPage();
             this.savedElevationBox = new System.Windows.Forms.ListBox();
             this.roundSettings = new System.Windows.Forms.GroupBox();
-            this.roundToNearest = new System.Windows.Forms.ComboBox();
             this.roundToNearestLabel = new System.Windows.Forms.Label();
             this.averageSettings = new System.Windows.Forms.GroupBox();
             this.averageSmoothCapLabel = new System.Windows.Forms.Label();
@@ -92,6 +91,7 @@ namespace WorldHeightmapClient
             this.globalStatus = new System.Windows.Forms.ToolStripProgressBar();
             this.groupStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.groupStatus = new System.Windows.Forms.ToolStripProgressBar();
+            this.roundToNearest = new System.Windows.Forms.NumericUpDown();
             this.settingsBox.SuspendLayout();
             this.dataTab.SuspendLayout();
             this.liveDataTab.SuspendLayout();
@@ -125,6 +125,7 @@ namespace WorldHeightmapClient
             this.resultSection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.resultDisplay)).BeginInit();
             this.statusBar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.roundToNearest)).BeginInit();
             this.SuspendLayout();
             // 
             // settingsBox
@@ -349,20 +350,6 @@ namespace WorldHeightmapClient
             this.roundSettings.TabStop = false;
             this.roundSettings.Text = "Round Smoothing Settings";
             // 
-            // roundToNearest
-            // 
-            this.roundToNearest.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.roundToNearest.FormattingEnabled = true;
-            this.roundToNearest.Items.AddRange(new object[] {
-            ".25",
-            ".5",
-            "1"});
-            this.roundToNearest.Location = new System.Drawing.Point(124, 25);
-            this.roundToNearest.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.roundToNearest.Name = "roundToNearest";
-            this.roundToNearest.Size = new System.Drawing.Size(65, 23);
-            this.roundToNearest.TabIndex = 2;
-            // 
             // roundToNearestLabel
             // 
             this.roundToNearestLabel.AutoSize = true;
@@ -417,7 +404,7 @@ namespace WorldHeightmapClient
             this.maxVertexDifference.Size = new System.Drawing.Size(65, 23);
             this.maxVertexDifference.TabIndex = 2;
             this.maxVertexDifference.Value = new decimal(new int[] {
-            35,
+            350,
             0,
             0,
             262144});
@@ -473,6 +460,7 @@ namespace WorldHeightmapClient
             this.noSmoothing.TabIndex = 5;
             this.noSmoothing.Text = "None";
             this.noSmoothing.UseVisualStyleBackColor = true;
+            this.noSmoothing.CheckedChanged += new System.EventHandler(this.NoSmoothing_CheckedChanged);
             // 
             // roundSmoothing
             // 
@@ -483,6 +471,7 @@ namespace WorldHeightmapClient
             this.roundSmoothing.TabIndex = 4;
             this.roundSmoothing.Text = "Round";
             this.roundSmoothing.UseVisualStyleBackColor = true;
+            this.roundSmoothing.CheckedChanged += new System.EventHandler(this.RoundSmoothing_CheckedChanged);
             // 
             // averageSmoothing
             // 
@@ -495,6 +484,7 @@ namespace WorldHeightmapClient
             this.averageSmoothing.TabStop = true;
             this.averageSmoothing.Text = "Average";
             this.averageSmoothing.UseVisualStyleBackColor = true;
+            this.averageSmoothing.CheckedChanged += new System.EventHandler(this.AverageSmoothing_CheckedChanged);
             // 
             // flattenSettings
             // 
@@ -910,6 +900,30 @@ namespace WorldHeightmapClient
             this.groupStatus.Name = "groupStatus";
             this.groupStatus.Size = new System.Drawing.Size(117, 18);
             // 
+            // roundToNearest
+            // 
+            this.roundToNearest.DecimalPlaces = 4;
+            this.roundToNearest.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this.roundToNearest.Location = new System.Drawing.Point(124, 27);
+            this.roundToNearest.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.roundToNearest.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.roundToNearest.Name = "roundToNearest";
+            this.roundToNearest.Size = new System.Drawing.Size(65, 23);
+            this.roundToNearest.TabIndex = 4;
+            this.roundToNearest.Value = new decimal(new int[] {
+            25,
+            0,
+            0,
+            131072});
+            // 
             // CoreForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -963,6 +977,7 @@ namespace WorldHeightmapClient
             ((System.ComponentModel.ISupportInitialize)(this.resultDisplay)).EndInit();
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.roundToNearest)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1019,7 +1034,6 @@ namespace WorldHeightmapClient
         private System.Windows.Forms.Label roundToNearestLabel;
         private System.Windows.Forms.Label averageSmoothCapLabel;
         private System.Windows.Forms.NumericUpDown maxVertexDifference;
-        private System.Windows.Forms.ComboBox roundToNearest;
         private System.Windows.Forms.GroupBox globalPosition;
         private System.Windows.Forms.Label latitudeLabel;
         private System.Windows.Forms.TextBox latitudeIn;
@@ -1034,6 +1048,7 @@ namespace WorldHeightmapClient
         private System.Windows.Forms.ListBox savedElevationBox;
         private System.Windows.Forms.NumericUpDown squishPercent;
         private System.Windows.Forms.Label squishPercentLabel;
+        private System.Windows.Forms.NumericUpDown roundToNearest;
     }
 }
 

@@ -137,6 +137,12 @@ namespace WorldHeightmapCore.Models
             return this;
         }
 
+        public GeneratorRequestBuilder WithSquishPercent(int percent)
+        {
+            SquishPercent = percent;
+            return this;
+        }
+
         public GeneratorRequestBuilder WithElevationDataset(string datasetFile, string defaultFolder = "")
         {
             ElevationData = true;

@@ -244,9 +244,11 @@ namespace WorldHeightmapClient
             if (noSmoothing.Checked)
                 builder.WithNoSmoothing();
             else if (roundSmoothing.Checked)
-                builder.WithRoundSmoothing(GetRoundToNearest(roundToNearest.SelectedIndex));
+                builder.WithRoundSmoothing((float)roundToNearest.Value);
             else if (averageSmoothing.Checked)
                 builder.WithAverageSmoothing((int)averagePasses.Value, (float)maxVertexDifference.Value);
+
+            builder.WithSquishPercent((int)squishPercent.Value);
 
             var result = await _heightmap.GenerateHeightmap(builder.Build());
 
@@ -285,15 +287,6 @@ namespace WorldHeightmapClient
                 5 => (int)40e3,
                 6 => (int)80e3,
                 _ => 0
-            };
-
-        public static float GetRoundToNearest(int index)
-            => index switch
-            {
-                0 => 0.25f,
-                1 => 0.5f,
-                2 => 1.0f,
-                _ => 0.25f
             };
 
         private void HeightSame_CheckedChanged(object sender, EventArgs e)

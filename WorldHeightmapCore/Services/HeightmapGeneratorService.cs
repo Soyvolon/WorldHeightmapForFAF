@@ -59,7 +59,15 @@ namespace WorldHeightmapCore.Services
 
             var heightmapPoints = ConvertElevationToHeightmapValues(elevationPoints, request, out var waterHeight);
 
-            var water = GetWaterHeights(heightmapPoints, waterHeight);
+            SquashPoints(heightmapPoints, request);
+
+            SmoothPoints(heightmapPoints, request);
+
+            (double, double, double) water;
+            if (GetMinMax(elevationPoints).Item1 >= 0.0)
+                water = (0, 0, 0);
+            else
+                water = GetWaterHeights(heightmapPoints, waterHeight);
 
             var rotatedPoints = RotatePoints(heightmapPoints);
 
@@ -75,6 +83,153 @@ namespace WorldHeightmapCore.Services
                 RawElevationData = elevationPoints,
                 ModifedElevationData = rotatedPoints
             };
+        }
+
+        private void SmoothPoints(double[,] data, GeneratorRequest request)
+        {
+            switch(request.SmoothingOptions)
+            {
+                case Smoothing.Average:
+                    for (int i = 0; i < request.AverageSmoothingPasses; i++)
+                        AveragePoints(data, request.AverageSmoothingMaxDifference);
+                    break;
+                case Smoothing.Round:
+                    RoundPoints(data, request.RoundSmoothingNearest);
+                    break;
+            }
+        }
+
+        private void AveragePoints(double[,] data, float averageTo)
+        {
+            for (int x = 1; x < data.GetLength(0) - 1; x += 2)
+            {
+                for (int y = 1; y < data.GetLength(1) - 1; y += 2)
+                {
+                    var tree = new double[,]
+                    {
+                        { data[x - 1, y - 1], data[x, y - 1], data[x + 1, y - 1] },
+                        { data[x - 1, y], data[x, y], data[x + 1, y] },
+                        { data[x - 1, y + 1], data[x, y + 1], data[x + 1, y + 1] }
+                    };
+
+                    var avgdist = AverageDistanceFromCenter(tree);
+
+                    if (avgdist <= averageTo) continue;
+
+                    var dist = GetDistanceFromCenter(tree);
+
+                    for (int tx = 0; tx < 3; tx++)
+                        for (int ty = 0; ty < 3; ty++)
+                            tree[tx, ty] = data[tx, ty] - dist[tx, ty];
+
+                    data.MapCenter(tree, x, y);
+                }
+            }
+        }
+
+        private double[,] GetDistanceFromCenter(double[,] data)
+        {
+            var w = data.GetLength(0);
+            var h = data.GetLength(1);
+            var output = new double[w, h];
+            double center = data[w / 2, h / 2];
+            for (int x = 0; x < w; x++)
+            {
+                for (int y = 0; y < h; y++)
+                {
+                    output[x, y] = center - data[x, y];
+                }
+            }
+
+            return output;
+        }
+
+        private double AverageDistanceFromCenter(double[,] data)
+        {
+            List<double> distances = new();
+            var center = data[data.GetLength(0) / 2, data.GetLength(1) / 2];
+            for (int x = 0; x < data.GetLength(0); x++)
+            {
+                for (int y = 0; y < data.GetLength(1); y++)
+                {
+                    if (x != 0 && y != 0)
+                        distances.Add(Math.Abs(center - data[x, y]));
+                }
+            }
+
+            return distances.Average();
+        }
+
+        private void RoundPoints(double[,] data, float roundTo)
+        {
+            var comp = roundTo / 2;
+            for (int x = 0; x < data.GetLength(0); x++)
+            {
+                for (int y = 0; y < data.GetLength(1); y++)
+                {
+                    var mod = data[x, y] % roundTo;
+                    var dif = roundTo - mod;
+
+                    if (mod >= comp)
+                        data[x, y] += dif;
+                    else data[x, y] -= mod;
+                }
+            }
+        }
+
+        private void SquashPoints(double[,] data, GeneratorRequest request)
+        {
+            switch(request.SquashOption)
+            {
+                case SquashType.Compress:
+                    for (int i = 0; i < request.SquashCompressPasses; i++)
+                        CompressPoints(data);
+                    break;
+                case SquashType.Flatten:
+                        FlattenPoints(data, request.SquashFlattenMin, request.SquashFlattenMax);
+                    break;
+            }
+        }
+
+        private void CompressPoints(double[,] data)
+        {
+            var avgabove = GetAvgHeightAboveFifty(data);
+            var mod = 1 - avgabove;
+
+            for (int x = 0; x < data.GetLength(0); x++)
+                for (int y = 0; y < data.GetLength(1); y++)
+                        data[x, y] *= mod;
+        }
+
+        private double GetAvgHeightAboveFifty(double[,] data)
+        {
+            double avg = 0;
+            int i = 0;
+            for (int x = 0; x < data.GetLength(0); x++)
+            {
+                for (int y = 0; y < data.GetLength(1); y++)
+                {
+                    if (data[x, y] > 50.0)
+                    {
+                        if (i++ > 0)
+                            avg = (avg + (data[x, y] - 50)) / 2.0;
+                        else
+                            avg = data[x, y] - 50;
+                    }
+                }
+            }
+
+            return avg;
+        }
+
+        private void FlattenPoints(double[,] data, double min, double max)
+        {
+            for (int x = 0; x < data.GetLength(0); x++)
+                for (int y = 0; y < data.GetLength(1); y++)
+                    if (data[x, y] < min)
+                        data[x, y] = min;
+                    else if (data[x, y] > max)
+                        data[x, y] = max;
         }
 
         private double[,] RotatePoints(double[,] data)
@@ -207,7 +362,7 @@ namespace WorldHeightmapCore.Services
             // ... Shift the dataset by the inverse of that ...
             var shiftedSet = ShiftPoints(elevation, 0 - average);
             // ... Squish the set so its min and max are close to a difference of 50 ...
-            var squishedSet = SquishPoints(shiftedSet, request.SquishPercent);
+            var squishedSet = SquishPoints(shiftedSet, request.SquishPercent, 50);
             // ... get the new min and max ...
             var minmax = GetMinMax(squishedSet);
 
@@ -251,7 +406,7 @@ namespace WorldHeightmapCore.Services
             return data;
         }
 
-        private double[,] SquishPoints(double[,] shifted, int squish)
+        private double[,] SquishPoints(double[,] shifted, int squish, double goalpoint)
         {
             var xw = shifted.GetLength(0);
             var yw = shifted.GetLength(1);
@@ -261,7 +416,7 @@ namespace WorldHeightmapCore.Services
             float squishPercentage = squish / 100f;
 
             int emergencybreak = 0;
-            var below = GetBelowThreshold(data);
+            var below = GetBelowThreshold(data, goalpoint);
             while (below < squishPercentage
                 && emergencybreak++ < BreakSquishAfter)
             {
@@ -275,7 +430,7 @@ namespace WorldHeightmapCore.Services
                     }
                 }
 
-                below = GetBelowThreshold(data);
+                below = GetBelowThreshold(data, goalpoint);
             }
 
             return data;
@@ -291,9 +446,9 @@ namespace WorldHeightmapCore.Services
             return (below, above);
         }
 
-        private double GetBelowThreshold(double[,] data)
+        private double GetBelowThreshold(double[,] data, double goalpoint)
         {
-            var goals = GetThresholdGoals(data);
+            var goals = GetThresholdGoals(data, goalpoint);
 
             double reachedgoal = 0.0;
             for (int x = 0; x < data.GetLength(0); x++)
@@ -312,14 +467,14 @@ namespace WorldHeightmapCore.Services
             return reachedgoalpercent;
         }
 
-        private (double, double) GetThresholdGoals(double[,] data)
+        private (double, double) GetThresholdGoals(double[,] data, double goalpoint)
         {
             var counts = GetAboveBelowZeroCounts(data);
 
             double belowZeroPercentage = (double)counts.Item1 / data.Length;
 
-            double mingoal = -(50 * belowZeroPercentage);
-            double maxgoal = 50 * (1 - belowZeroPercentage);
+            double mingoal = -(goalpoint * belowZeroPercentage);
+            double maxgoal = goalpoint * (1 - belowZeroPercentage);
 
             return (mingoal, maxgoal);
         }
