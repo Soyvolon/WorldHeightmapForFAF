@@ -21,12 +21,13 @@ namespace WorldHeightmapCore.Models
         public int SquashFlattenMax { get; set; } = 55;
         public Smoothing SmoothingOptions { get; set; } = Smoothing.Average;
         public int AverageSmoothingPasses { get; set; } = 3;
-        public float AverageSmoothingMaxDifference { get; set; } = 0.0035f;
+        public int SmoothFWHM { get; set; } = 4;
         public float RoundSmoothingNearest { get; set; } = 0.50f;
         public bool ElevationData { get; set; } = false;
         public string DataFileLocation { get; set; } = "";
         public int SquishPercent { get; set; } = 80;
         public bool EarthEngine { get; set; } = false;
+        public int KernelSize { get; set; } = 5;
 
         public GeneratorRequestBuilder()
         {
@@ -116,10 +117,14 @@ namespace WorldHeightmapCore.Models
             return this;
         }
 
-        public GeneratorRequestBuilder WithAverageSmoothing(int passes, float maxDiff)
+        public GeneratorRequestBuilder WithAverageSmoothing(int passes, int fwhm, int kernelSize)
         {
+            if (kernelSize % 2 != 1 || kernelSize <= 1)
+                throw new ArgumentException("Size must be odd and larger than 1.", nameof(kernelSize));
+
+            KernelSize = kernelSize;
             AverageSmoothingPasses = passes;
-            AverageSmoothingMaxDifference = maxDiff;
+            SmoothFWHM = fwhm;
             SmoothingOptions = Smoothing.Average;
             return this;
         }
@@ -177,12 +182,13 @@ namespace WorldHeightmapCore.Models
                 SquashFlattenMax = SquashFlattenMax,
                 SmoothingOptions = SmoothingOptions,
                 AverageSmoothingPasses = AverageSmoothingPasses,
-                AverageSmoothingMaxDifference = AverageSmoothingMaxDifference,
+                SmoothFWHM = SmoothFWHM,
                 RoundSmoothingNearest = RoundSmoothingNearest,
                 ElevationData = ElevationData,
                 DataFileLocation = DataFileLocation,
                 SquishPercent = SquishPercent,
-                EarthEngine = EarthEngine
+                EarthEngine = EarthEngine,
+                KernelSize = KernelSize
             };
         }
     }

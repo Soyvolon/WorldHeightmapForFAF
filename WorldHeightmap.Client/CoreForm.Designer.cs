@@ -46,10 +46,11 @@ namespace WorldHeightmap.Client
             this.savedDataTab = new System.Windows.Forms.TabPage();
             this.savedElevationBox = new System.Windows.Forms.ListBox();
             this.roundSettings = new System.Windows.Forms.GroupBox();
+            this.roundToNearest = new System.Windows.Forms.NumericUpDown();
             this.roundToNearestLabel = new System.Windows.Forms.Label();
             this.averageSettings = new System.Windows.Forms.GroupBox();
-            this.averageSmoothCapLabel = new System.Windows.Forms.Label();
-            this.maxVertexDifference = new System.Windows.Forms.NumericUpDown();
+            this.fwhmLabel = new System.Windows.Forms.Label();
+            this.fwhmCounter = new System.Windows.Forms.NumericUpDown();
             this.averagePassesLabel = new System.Windows.Forms.Label();
             this.averagePasses = new System.Windows.Forms.NumericUpDown();
             this.smoothingOptionsBox = new System.Windows.Forms.GroupBox();
@@ -91,15 +92,17 @@ namespace WorldHeightmap.Client
             this.globalStatus = new System.Windows.Forms.ToolStripProgressBar();
             this.groupStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.groupStatus = new System.Windows.Forms.ToolStripProgressBar();
-            this.roundToNearest = new System.Windows.Forms.NumericUpDown();
+            this.kernelSizeLabel = new System.Windows.Forms.Label();
+            this.kernelSize = new System.Windows.Forms.NumericUpDown();
             this.settingsBox.SuspendLayout();
             this.dataTab.SuspendLayout();
             this.liveDataTab.SuspendLayout();
             this.globalPosition.SuspendLayout();
             this.savedDataTab.SuspendLayout();
             this.roundSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.roundToNearest)).BeginInit();
             this.averageSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.maxVertexDifference)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.fwhmCounter)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.averagePasses)).BeginInit();
             this.smoothingOptionsBox.SuspendLayout();
             this.flattenSettings.SuspendLayout();
@@ -125,7 +128,7 @@ namespace WorldHeightmap.Client
             this.resultSection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.resultDisplay)).BeginInit();
             this.statusBar.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.roundToNearest)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.kernelSize)).BeginInit();
             this.SuspendLayout();
             // 
             // settingsBox
@@ -157,7 +160,7 @@ namespace WorldHeightmap.Client
             this.dataTab.Location = new System.Drawing.Point(6, 22);
             this.dataTab.Name = "dataTab";
             this.dataTab.SelectedIndex = 0;
-            this.dataTab.Size = new System.Drawing.Size(369, 250);
+            this.dataTab.Size = new System.Drawing.Size(369, 214);
             this.dataTab.TabIndex = 15;
             // 
             // liveDataTab
@@ -172,7 +175,7 @@ namespace WorldHeightmap.Client
             this.liveDataTab.Location = new System.Drawing.Point(4, 24);
             this.liveDataTab.Name = "liveDataTab";
             this.liveDataTab.Padding = new System.Windows.Forms.Padding(3);
-            this.liveDataTab.Size = new System.Drawing.Size(361, 222);
+            this.liveDataTab.Size = new System.Drawing.Size(361, 186);
             this.liveDataTab.TabIndex = 0;
             this.liveDataTab.Text = "Live Data";
             this.liveDataTab.UseVisualStyleBackColor = true;
@@ -244,7 +247,7 @@ namespace WorldHeightmap.Client
             this.heightSame.AutoSize = true;
             this.heightSame.Checked = true;
             this.heightSame.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.heightSame.Location = new System.Drawing.Point(250, 160);
+            this.heightSame.Location = new System.Drawing.Point(248, 125);
             this.heightSame.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.heightSame.Name = "heightSame";
             this.heightSame.Size = new System.Drawing.Size(104, 19);
@@ -265,7 +268,7 @@ namespace WorldHeightmap.Client
             "20 km (1024px)",
             "40 km (2048px)",
             "80 km (4096px)"});
-            this.mapWidth.Location = new System.Drawing.Point(55, 187);
+            this.mapWidth.Location = new System.Drawing.Point(53, 152);
             this.mapWidth.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.mapWidth.Name = "mapWidth";
             this.mapWidth.Size = new System.Drawing.Size(119, 23);
@@ -277,7 +280,7 @@ namespace WorldHeightmap.Client
             this.heighLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.heighLabel.AutoSize = true;
-            this.heighLabel.Location = new System.Drawing.Point(189, 190);
+            this.heighLabel.Location = new System.Drawing.Point(187, 155);
             this.heighLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.heighLabel.Name = "heighLabel";
             this.heighLabel.Size = new System.Drawing.Size(43, 15);
@@ -287,7 +290,7 @@ namespace WorldHeightmap.Client
             // widthLabel
             // 
             this.widthLabel.AutoSize = true;
-            this.widthLabel.Location = new System.Drawing.Point(8, 190);
+            this.widthLabel.Location = new System.Drawing.Point(6, 155);
             this.widthLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.widthLabel.Name = "widthLabel";
             this.widthLabel.Size = new System.Drawing.Size(39, 15);
@@ -309,7 +312,7 @@ namespace WorldHeightmap.Client
             "20 km (1024px)",
             "40 km (2048px)",
             "80 km (4096px)"});
-            this.mapHeight.Location = new System.Drawing.Point(240, 187);
+            this.mapHeight.Location = new System.Drawing.Point(238, 152);
             this.mapHeight.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.mapHeight.Name = "mapHeight";
             this.mapHeight.Size = new System.Drawing.Size(114, 23);
@@ -350,6 +353,30 @@ namespace WorldHeightmap.Client
             this.roundSettings.TabStop = false;
             this.roundSettings.Text = "Round Smoothing Settings";
             // 
+            // roundToNearest
+            // 
+            this.roundToNearest.DecimalPlaces = 4;
+            this.roundToNearest.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this.roundToNearest.Location = new System.Drawing.Point(124, 27);
+            this.roundToNearest.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.roundToNearest.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.roundToNearest.Name = "roundToNearest";
+            this.roundToNearest.Size = new System.Drawing.Size(65, 23);
+            this.roundToNearest.TabIndex = 4;
+            this.roundToNearest.Value = new decimal(new int[] {
+            25,
+            0,
+            0,
+            131072});
+            // 
             // roundToNearestLabel
             // 
             this.roundToNearestLabel.AutoSize = true;
@@ -362,52 +389,53 @@ namespace WorldHeightmap.Client
             // 
             // averageSettings
             // 
-            this.averageSettings.Controls.Add(this.averageSmoothCapLabel);
-            this.averageSettings.Controls.Add(this.maxVertexDifference);
+            this.averageSettings.Controls.Add(this.kernelSizeLabel);
+            this.averageSettings.Controls.Add(this.kernelSize);
+            this.averageSettings.Controls.Add(this.fwhmLabel);
+            this.averageSettings.Controls.Add(this.fwhmCounter);
             this.averageSettings.Controls.Add(this.averagePassesLabel);
             this.averageSettings.Controls.Add(this.averagePasses);
-            this.averageSettings.Location = new System.Drawing.Point(173, 504);
+            this.averageSettings.Location = new System.Drawing.Point(173, 468);
             this.averageSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.averageSettings.Name = "averageSettings";
             this.averageSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.averageSettings.Size = new System.Drawing.Size(201, 85);
+            this.averageSettings.Size = new System.Drawing.Size(201, 122);
             this.averageSettings.TabIndex = 11;
             this.averageSettings.TabStop = false;
             this.averageSettings.Text = "Average Smoothing Settings";
             // 
-            // averageSmoothCapLabel
+            // fwhmLabel
             // 
-            this.averageSmoothCapLabel.AutoSize = true;
-            this.averageSmoothCapLabel.Location = new System.Drawing.Point(7, 60);
-            this.averageSmoothCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.averageSmoothCapLabel.Name = "averageSmoothCapLabel";
-            this.averageSmoothCapLabel.Size = new System.Drawing.Size(87, 15);
-            this.averageSmoothCapLabel.TabIndex = 3;
-            this.averageSmoothCapLabel.Text = "Max Difference";
+            this.fwhmLabel.AutoSize = true;
+            this.fwhmLabel.Location = new System.Drawing.Point(7, 60);
+            this.fwhmLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.fwhmLabel.Name = "fwhmLabel";
+            this.fwhmLabel.Size = new System.Drawing.Size(44, 15);
+            this.fwhmLabel.TabIndex = 3;
+            this.fwhmLabel.Text = "FWHM";
             // 
-            // maxVertexDifference
+            // fwhmCounter
             // 
-            this.maxVertexDifference.DecimalPlaces = 4;
-            this.maxVertexDifference.Increment = new decimal(new int[] {
-            1,
+            this.fwhmCounter.Location = new System.Drawing.Point(124, 58);
+            this.fwhmCounter.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.fwhmCounter.Maximum = new decimal(new int[] {
+            20,
             0,
             0,
-            196608});
-            this.maxVertexDifference.Location = new System.Drawing.Point(124, 58);
-            this.maxVertexDifference.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.maxVertexDifference.Maximum = new decimal(new int[] {
+            0});
+            this.fwhmCounter.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.maxVertexDifference.Name = "maxVertexDifference";
-            this.maxVertexDifference.Size = new System.Drawing.Size(65, 23);
-            this.maxVertexDifference.TabIndex = 2;
-            this.maxVertexDifference.Value = new decimal(new int[] {
-            350,
+            this.fwhmCounter.Name = "fwhmCounter";
+            this.fwhmCounter.Size = new System.Drawing.Size(65, 23);
+            this.fwhmCounter.TabIndex = 2;
+            this.fwhmCounter.Value = new decimal(new int[] {
+            4,
             0,
             0,
-            262144});
+            0});
             // 
             // averagePassesLabel
             // 
@@ -442,11 +470,11 @@ namespace WorldHeightmap.Client
             this.smoothingOptionsBox.Controls.Add(this.noSmoothing);
             this.smoothingOptionsBox.Controls.Add(this.roundSmoothing);
             this.smoothingOptionsBox.Controls.Add(this.averageSmoothing);
-            this.smoothingOptionsBox.Location = new System.Drawing.Point(5, 504);
+            this.smoothingOptionsBox.Location = new System.Drawing.Point(5, 468);
             this.smoothingOptionsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.smoothingOptionsBox.Name = "smoothingOptionsBox";
             this.smoothingOptionsBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.smoothingOptionsBox.Size = new System.Drawing.Size(160, 152);
+            this.smoothingOptionsBox.Size = new System.Drawing.Size(160, 188);
             this.smoothingOptionsBox.TabIndex = 12;
             this.smoothingOptionsBox.TabStop = false;
             this.smoothingOptionsBox.Text = "Smoothing";
@@ -493,7 +521,7 @@ namespace WorldHeightmap.Client
             this.flattenSettings.Controls.Add(this.minMapHeightLabel);
             this.flattenSettings.Controls.Add(this.flattenMin);
             this.flattenSettings.Enabled = false;
-            this.flattenSettings.Location = new System.Drawing.Point(173, 400);
+            this.flattenSettings.Location = new System.Drawing.Point(173, 364);
             this.flattenSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.flattenSettings.Name = "flattenSettings";
             this.flattenSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -547,7 +575,7 @@ namespace WorldHeightmap.Client
             // 
             this.compressSettings.Controls.Add(this.compressPassesLabel);
             this.compressSettings.Controls.Add(this.compressPasses);
-            this.compressSettings.Location = new System.Drawing.Point(173, 331);
+            this.compressSettings.Location = new System.Drawing.Point(173, 295);
             this.compressSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.compressSettings.Name = "compressSettings";
             this.compressSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -591,7 +619,7 @@ namespace WorldHeightmap.Client
             this.squashGroup.Controls.Add(this.noSquash);
             this.squashGroup.Controls.Add(this.flattenSquash);
             this.squashGroup.Controls.Add(this.compressSquash);
-            this.squashGroup.Location = new System.Drawing.Point(5, 331);
+            this.squashGroup.Location = new System.Drawing.Point(5, 295);
             this.squashGroup.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.squashGroup.Name = "squashGroup";
             this.squashGroup.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -665,7 +693,7 @@ namespace WorldHeightmap.Client
             // 
             this.waterTypeSelection.Controls.Add(this.automaticWater);
             this.waterTypeSelection.Controls.Add(this.flattenWater);
-            this.waterTypeSelection.Location = new System.Drawing.Point(6, 278);
+            this.waterTypeSelection.Location = new System.Drawing.Point(6, 242);
             this.waterTypeSelection.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.waterTypeSelection.Name = "waterTypeSelection";
             this.waterTypeSelection.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -900,29 +928,43 @@ namespace WorldHeightmap.Client
             this.groupStatus.Name = "groupStatus";
             this.groupStatus.Size = new System.Drawing.Size(117, 18);
             // 
-            // roundToNearest
+            // kernelSizeLabel
             // 
-            this.roundToNearest.DecimalPlaces = 4;
-            this.roundToNearest.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
-            this.roundToNearest.Location = new System.Drawing.Point(124, 27);
-            this.roundToNearest.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.roundToNearest.Maximum = new decimal(new int[] {
-            1,
+            this.kernelSizeLabel.AutoSize = true;
+            this.kernelSizeLabel.Location = new System.Drawing.Point(7, 89);
+            this.kernelSizeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.kernelSizeLabel.Name = "kernelSizeLabel";
+            this.kernelSizeLabel.Size = new System.Drawing.Size(63, 15);
+            this.kernelSizeLabel.TabIndex = 5;
+            this.kernelSizeLabel.Text = "Kernel Size";
+            // 
+            // kernelSize
+            // 
+            this.kernelSize.Increment = new decimal(new int[] {
+            2,
             0,
             0,
             0});
-            this.roundToNearest.Name = "roundToNearest";
-            this.roundToNearest.Size = new System.Drawing.Size(65, 23);
-            this.roundToNearest.TabIndex = 4;
-            this.roundToNearest.Value = new decimal(new int[] {
-            25,
+            this.kernelSize.Location = new System.Drawing.Point(124, 87);
+            this.kernelSize.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.kernelSize.Maximum = new decimal(new int[] {
+            101,
             0,
             0,
-            131072});
+            0});
+            this.kernelSize.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.kernelSize.Name = "kernelSize";
+            this.kernelSize.Size = new System.Drawing.Size(65, 23);
+            this.kernelSize.TabIndex = 4;
+            this.kernelSize.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
             // 
             // CoreForm
             // 
@@ -944,9 +986,10 @@ namespace WorldHeightmap.Client
             this.savedDataTab.ResumeLayout(false);
             this.roundSettings.ResumeLayout(false);
             this.roundSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.roundToNearest)).EndInit();
             this.averageSettings.ResumeLayout(false);
             this.averageSettings.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.maxVertexDifference)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.fwhmCounter)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.averagePasses)).EndInit();
             this.smoothingOptionsBox.ResumeLayout(false);
             this.flattenSettings.ResumeLayout(false);
@@ -977,7 +1020,7 @@ namespace WorldHeightmap.Client
             ((System.ComponentModel.ISupportInitialize)(this.resultDisplay)).EndInit();
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.roundToNearest)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.kernelSize)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1032,8 +1075,8 @@ namespace WorldHeightmap.Client
         private System.Windows.Forms.NumericUpDown averagePasses;
         private System.Windows.Forms.GroupBox roundSettings;
         private System.Windows.Forms.Label roundToNearestLabel;
-        private System.Windows.Forms.Label averageSmoothCapLabel;
-        private System.Windows.Forms.NumericUpDown maxVertexDifference;
+        private System.Windows.Forms.Label fwhmLabel;
+        private System.Windows.Forms.NumericUpDown fwhmCounter;
         private System.Windows.Forms.GroupBox globalPosition;
         private System.Windows.Forms.Label latitudeLabel;
         private System.Windows.Forms.TextBox latitudeIn;
@@ -1049,6 +1092,8 @@ namespace WorldHeightmap.Client
         private System.Windows.Forms.NumericUpDown squishPercent;
         private System.Windows.Forms.Label squishPercentLabel;
         private System.Windows.Forms.NumericUpDown roundToNearest;
+        private System.Windows.Forms.Label kernelSizeLabel;
+        private System.Windows.Forms.NumericUpDown kernelSize;
     }
 }
 

@@ -88,7 +88,7 @@ namespace WorldHeightmapCore.Services
             {
                 case Smoothing.Average:
                     for (int i = 0; i < request.AverageSmoothingPasses; i++)
-                        AveragePoints(data, request.AverageSmoothingMaxDifference);
+                        AveragePoints(data, request.SmoothFWHM, request.KernelSize);
                     break;
                 case Smoothing.Round:
                     RoundPoints(data, request.RoundSmoothingNearest);
@@ -96,32 +96,105 @@ namespace WorldHeightmapCore.Services
             }
         }
 
-        private void AveragePoints(double[,] data, float averageTo)
+        private void AveragePoints(double[,] data, int fwhm, int size)
         {
-            for (int x = 1; x < data.GetLength(0) - 1; x += 2)
+            var output = new double[data.GetLength(0), data.GetLength(1)];
+
+            var weights = GetWeights(size, FwhmToSigma(fwhm));
+            var halfsize = 5 / 2;
+            
+            for(int x = 0; x < data.GetLength(0); x++)
             {
-                for (int y = 1; y < data.GetLength(1) - 1; y += 2)
+                for(int y = 0; y < data.GetLength(1); y++)
                 {
-                    var tree = new double[,]
+                    double[,] tree = new double[size, size];
+
+                    int wx = 0; int wy = 0;
+                    for(int w = x - halfsize; wx < size; w++)
                     {
-                        { data[x - 1, y - 1], data[x, y - 1], data[x + 1, y - 1] },
-                        { data[x - 1, y], data[x, y], data[x + 1, y] },
-                        { data[x - 1, y + 1], data[x, y + 1], data[x + 1, y + 1] }
-                    };
+                        for(int h = y - halfsize; wy < size; h++)
+                        {
+                            if (w < 0) w = 0;
+                            if (h < 0) h = 0;
+                            if (w >= data.GetLength(0)) w = data.GetLength(0) - 1;
+                            if (h >= data.GetLength(1)) h = data.GetLength(1) - 1;
 
-                    var avgdist = AverageDistanceFromCenter(tree);
+                            tree[wx, wy++] = data[w, h];
+                        }
 
-                    if (avgdist <= averageTo) continue;
+                        wy = 0;
+                        wx++;
+                    }
 
-                    var dist = GetDistanceFromCenter(tree);
+                    var point = GetSmoothedValue(weights, tree);
 
-                    for (int tx = 0; tx < 3; tx++)
-                        for (int ty = 0; ty < 3; ty++)
-                            tree[tx, ty] = data[tx, ty] - dist[tx, ty];
-
-                    data.MapCenter(tree, x, y);
+                    output[x, y] = point;
                 }
             }
+
+            data.Map(output, 0, 0);
+        }
+
+        public double FwhmToSigma(double fwhm)
+        {
+            return fwhm / Math.Sqrt(8 * Math.Log(2));
+        }
+
+        public double SigmaToFwhm(double sigma)
+        {
+            return sigma * Math.Sqrt(8 * Math.Log(2));
+        }
+
+        public double[,] GetWeights(int size, double fwhm)
+        {
+            double[,] kernels = new double[size, size];
+
+            double sum = 0;
+            int foff = (size - 1) / 2;
+            double constant = 1.0 / (2 * Math.PI * Math.Pow(fwhm, 2.0));
+
+            for (int y = -foff; y <= foff; y++)
+            {
+                for (int x = -foff; x <= foff; x++)
+                {
+                    var distance = (Math.Pow(y, 2.0) + Math.Pow(x, 2.0)) / (2 * Math.Pow(fwhm, 2.0));
+                    kernels[y + foff, x + foff] = constant * Math.Exp(-distance);
+                    sum += kernels[y + foff, x + foff];
+                }
+            }
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    kernels[y, x] = kernels[y, x] * 1d / sum;
+                }
+            }
+
+            //var sigma = FwhmToSigma(fwhm);
+
+            //var half = size / 2;
+
+            //for (int i = 0; i < size; i++)
+            //    kernels[i] = Math.Exp(-Math.Pow((i - half), 2.0) / (2 * Math.Pow(sigma, 2.0)));
+
+            //double sum = kernels.Sum();
+
+            //for (int i = 0; i < kernels.Length; i++)
+            //    kernels[i] /= sum;
+
+            return kernels;
+        }
+
+        private double GetSmoothedValue(double[,] weights, double[,] values)
+        {
+            double sum = 0.0;
+
+            for(int x = 0; x < weights.GetLength(0); x++)
+                for(int y = 0; y < weights.GetLength(1); y++)
+                    sum += weights[x, y] * values[x, y];
+
+            return sum;
         }
 
         private double[,] GetDistanceFromCenter(double[,] data)
@@ -322,6 +395,9 @@ namespace WorldHeightmapCore.Services
             if(waterHeight != 0.0)
             {
                 var waterPoints = GetAllPointsBelow(sqished, waterHeight);
+
+                if(waterPoints.Count <= 0)
+                    return (waterHeight, depthHeight, abyssHeight);
 
                 waterPoints.Sort();
 

@@ -246,7 +246,17 @@ namespace WorldHeightmap.Client
             else if (roundSmoothing.Checked)
                 builder.WithRoundSmoothing((float)roundToNearest.Value);
             else if (averageSmoothing.Checked)
-                builder.WithAverageSmoothing((int)averagePasses.Value, (float)maxVertexDifference.Value);
+            {
+                try
+                {
+                    builder.WithAverageSmoothing((int)averagePasses.Value, (int)fwhmCounter.Value, (int)kernelSize.Value);
+                }
+                catch (ArgumentException ae)
+                {
+                    MessageBox.Show(ae.Message, "Invalid Kernel Size", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
 
             builder.WithSquishPercent((int)squishPercent.Value);
 

@@ -18,12 +18,13 @@ namespace WorldHeightmapCore.Models
         public int SquashFlattenMax { get; internal set; }
         public Smoothing SmoothingOptions { get; internal set; }
         public int AverageSmoothingPasses { get; internal set; }
-        public float AverageSmoothingMaxDifference { get; internal set; }
+        public int SmoothFWHM { get; internal set; }
         public float RoundSmoothingNearest { get; internal set; }
         public bool ElevationData { get; internal set; }
         public string DataFileLocation { get; internal set; }
         public int SquishPercent { get; internal set; }
         public bool EarthEngine { get; internal set; }
+        public int KernelSize { get; internal set; }
     }
 
     public enum WaterType
