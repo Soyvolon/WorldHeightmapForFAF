@@ -48,7 +48,9 @@ namespace WorldHeightmap.Client
             this.roundSettings = new System.Windows.Forms.GroupBox();
             this.roundToNearest = new System.Windows.Forms.NumericUpDown();
             this.roundToNearestLabel = new System.Windows.Forms.Label();
-            this.averageSettings = new System.Windows.Forms.GroupBox();
+            this.normalSettings = new System.Windows.Forms.GroupBox();
+            this.kernelSizeLabel = new System.Windows.Forms.Label();
+            this.kernelSize = new System.Windows.Forms.NumericUpDown();
             this.fwhmLabel = new System.Windows.Forms.Label();
             this.fwhmCounter = new System.Windows.Forms.NumericUpDown();
             this.averagePassesLabel = new System.Windows.Forms.Label();
@@ -56,7 +58,7 @@ namespace WorldHeightmap.Client
             this.smoothingOptionsBox = new System.Windows.Forms.GroupBox();
             this.noSmoothing = new System.Windows.Forms.RadioButton();
             this.roundSmoothing = new System.Windows.Forms.RadioButton();
-            this.averageSmoothing = new System.Windows.Forms.RadioButton();
+            this.normalSmoothing = new System.Windows.Forms.RadioButton();
             this.flattenSettings = new System.Windows.Forms.GroupBox();
             this.maxMapHeightLabel = new System.Windows.Forms.Label();
             this.flattenMax = new System.Windows.Forms.NumericUpDown();
@@ -92,8 +94,7 @@ namespace WorldHeightmap.Client
             this.globalStatus = new System.Windows.Forms.ToolStripProgressBar();
             this.groupStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.groupStatus = new System.Windows.Forms.ToolStripProgressBar();
-            this.kernelSizeLabel = new System.Windows.Forms.Label();
-            this.kernelSize = new System.Windows.Forms.NumericUpDown();
+            this.combinedSmoothing = new System.Windows.Forms.RadioButton();
             this.settingsBox.SuspendLayout();
             this.dataTab.SuspendLayout();
             this.liveDataTab.SuspendLayout();
@@ -101,7 +102,8 @@ namespace WorldHeightmap.Client
             this.savedDataTab.SuspendLayout();
             this.roundSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.roundToNearest)).BeginInit();
-            this.averageSettings.SuspendLayout();
+            this.normalSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.kernelSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fwhmCounter)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.averagePasses)).BeginInit();
             this.smoothingOptionsBox.SuspendLayout();
@@ -128,7 +130,6 @@ namespace WorldHeightmap.Client
             this.resultSection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.resultDisplay)).BeginInit();
             this.statusBar.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kernelSize)).BeginInit();
             this.SuspendLayout();
             // 
             // settingsBox
@@ -137,7 +138,7 @@ namespace WorldHeightmap.Client
             | System.Windows.Forms.AnchorStyles.Left)));
             this.settingsBox.Controls.Add(this.dataTab);
             this.settingsBox.Controls.Add(this.roundSettings);
-            this.settingsBox.Controls.Add(this.averageSettings);
+            this.settingsBox.Controls.Add(this.normalSettings);
             this.settingsBox.Controls.Add(this.smoothingOptionsBox);
             this.settingsBox.Controls.Add(this.flattenSettings);
             this.settingsBox.Controls.Add(this.compressSettings);
@@ -324,7 +325,7 @@ namespace WorldHeightmap.Client
             this.savedDataTab.Location = new System.Drawing.Point(4, 24);
             this.savedDataTab.Name = "savedDataTab";
             this.savedDataTab.Padding = new System.Windows.Forms.Padding(3);
-            this.savedDataTab.Size = new System.Drawing.Size(361, 222);
+            this.savedDataTab.Size = new System.Drawing.Size(361, 186);
             this.savedDataTab.TabIndex = 1;
             this.savedDataTab.Text = "Saved Data";
             this.savedDataTab.UseVisualStyleBackColor = true;
@@ -336,7 +337,7 @@ namespace WorldHeightmap.Client
             this.savedElevationBox.ItemHeight = 15;
             this.savedElevationBox.Location = new System.Drawing.Point(3, 3);
             this.savedElevationBox.Name = "savedElevationBox";
-            this.savedElevationBox.Size = new System.Drawing.Size(355, 216);
+            this.savedElevationBox.Size = new System.Drawing.Size(355, 180);
             this.savedElevationBox.TabIndex = 0;
             // 
             // roundSettings
@@ -387,22 +388,60 @@ namespace WorldHeightmap.Client
             this.roundToNearestLabel.TabIndex = 1;
             this.roundToNearestLabel.Text = "Round To Nearest";
             // 
-            // averageSettings
+            // normalSettings
             // 
-            this.averageSettings.Controls.Add(this.kernelSizeLabel);
-            this.averageSettings.Controls.Add(this.kernelSize);
-            this.averageSettings.Controls.Add(this.fwhmLabel);
-            this.averageSettings.Controls.Add(this.fwhmCounter);
-            this.averageSettings.Controls.Add(this.averagePassesLabel);
-            this.averageSettings.Controls.Add(this.averagePasses);
-            this.averageSettings.Location = new System.Drawing.Point(173, 468);
-            this.averageSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.averageSettings.Name = "averageSettings";
-            this.averageSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.averageSettings.Size = new System.Drawing.Size(201, 122);
-            this.averageSettings.TabIndex = 11;
-            this.averageSettings.TabStop = false;
-            this.averageSettings.Text = "Average Smoothing Settings";
+            this.normalSettings.Controls.Add(this.kernelSizeLabel);
+            this.normalSettings.Controls.Add(this.kernelSize);
+            this.normalSettings.Controls.Add(this.fwhmLabel);
+            this.normalSettings.Controls.Add(this.fwhmCounter);
+            this.normalSettings.Controls.Add(this.averagePassesLabel);
+            this.normalSettings.Controls.Add(this.averagePasses);
+            this.normalSettings.Location = new System.Drawing.Point(173, 468);
+            this.normalSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.normalSettings.Name = "normalSettings";
+            this.normalSettings.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.normalSettings.Size = new System.Drawing.Size(201, 122);
+            this.normalSettings.TabIndex = 11;
+            this.normalSettings.TabStop = false;
+            this.normalSettings.Text = "Normal Smoothing Settings";
+            // 
+            // kernelSizeLabel
+            // 
+            this.kernelSizeLabel.AutoSize = true;
+            this.kernelSizeLabel.Location = new System.Drawing.Point(7, 89);
+            this.kernelSizeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.kernelSizeLabel.Name = "kernelSizeLabel";
+            this.kernelSizeLabel.Size = new System.Drawing.Size(63, 15);
+            this.kernelSizeLabel.TabIndex = 5;
+            this.kernelSizeLabel.Text = "Kernel Size";
+            // 
+            // kernelSize
+            // 
+            this.kernelSize.Increment = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.kernelSize.Location = new System.Drawing.Point(124, 87);
+            this.kernelSize.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.kernelSize.Maximum = new decimal(new int[] {
+            101,
+            0,
+            0,
+            0});
+            this.kernelSize.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.kernelSize.Name = "kernelSize";
+            this.kernelSize.Size = new System.Drawing.Size(65, 23);
+            this.kernelSize.TabIndex = 4;
+            this.kernelSize.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
             // 
             // fwhmLabel
             // 
@@ -467,9 +506,10 @@ namespace WorldHeightmap.Client
             // 
             // smoothingOptionsBox
             // 
+            this.smoothingOptionsBox.Controls.Add(this.combinedSmoothing);
             this.smoothingOptionsBox.Controls.Add(this.noSmoothing);
             this.smoothingOptionsBox.Controls.Add(this.roundSmoothing);
-            this.smoothingOptionsBox.Controls.Add(this.averageSmoothing);
+            this.smoothingOptionsBox.Controls.Add(this.normalSmoothing);
             this.smoothingOptionsBox.Location = new System.Drawing.Point(5, 468);
             this.smoothingOptionsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.smoothingOptionsBox.Name = "smoothingOptionsBox";
@@ -481,7 +521,7 @@ namespace WorldHeightmap.Client
             // 
             // noSmoothing
             // 
-            this.noSmoothing.Location = new System.Drawing.Point(7, 98);
+            this.noSmoothing.Location = new System.Drawing.Point(9, 132);
             this.noSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.noSmoothing.Name = "noSmoothing";
             this.noSmoothing.Size = new System.Drawing.Size(148, 28);
@@ -501,18 +541,18 @@ namespace WorldHeightmap.Client
             this.roundSmoothing.UseVisualStyleBackColor = true;
             this.roundSmoothing.CheckedChanged += new System.EventHandler(this.RoundSmoothing_CheckedChanged);
             // 
-            // averageSmoothing
+            // normalSmoothing
             // 
-            this.averageSmoothing.Checked = true;
-            this.averageSmoothing.Location = new System.Drawing.Point(8, 30);
-            this.averageSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.averageSmoothing.Name = "averageSmoothing";
-            this.averageSmoothing.Size = new System.Drawing.Size(148, 28);
-            this.averageSmoothing.TabIndex = 3;
-            this.averageSmoothing.TabStop = true;
-            this.averageSmoothing.Text = "Average";
-            this.averageSmoothing.UseVisualStyleBackColor = true;
-            this.averageSmoothing.CheckedChanged += new System.EventHandler(this.AverageSmoothing_CheckedChanged);
+            this.normalSmoothing.Checked = true;
+            this.normalSmoothing.Location = new System.Drawing.Point(8, 30);
+            this.normalSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.normalSmoothing.Name = "normalSmoothing";
+            this.normalSmoothing.Size = new System.Drawing.Size(148, 28);
+            this.normalSmoothing.TabIndex = 3;
+            this.normalSmoothing.TabStop = true;
+            this.normalSmoothing.Text = "Normal";
+            this.normalSmoothing.UseVisualStyleBackColor = true;
+            this.normalSmoothing.CheckedChanged += new System.EventHandler(this.AverageSmoothing_CheckedChanged);
             // 
             // flattenSettings
             // 
@@ -928,43 +968,16 @@ namespace WorldHeightmap.Client
             this.groupStatus.Name = "groupStatus";
             this.groupStatus.Size = new System.Drawing.Size(117, 18);
             // 
-            // kernelSizeLabel
+            // combinedSmoothing
             // 
-            this.kernelSizeLabel.AutoSize = true;
-            this.kernelSizeLabel.Location = new System.Drawing.Point(7, 89);
-            this.kernelSizeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.kernelSizeLabel.Name = "kernelSizeLabel";
-            this.kernelSizeLabel.Size = new System.Drawing.Size(63, 15);
-            this.kernelSizeLabel.TabIndex = 5;
-            this.kernelSizeLabel.Text = "Kernel Size";
-            // 
-            // kernelSize
-            // 
-            this.kernelSize.Increment = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.kernelSize.Location = new System.Drawing.Point(124, 87);
-            this.kernelSize.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.kernelSize.Maximum = new decimal(new int[] {
-            101,
-            0,
-            0,
-            0});
-            this.kernelSize.Minimum = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-            this.kernelSize.Name = "kernelSize";
-            this.kernelSize.Size = new System.Drawing.Size(65, 23);
-            this.kernelSize.TabIndex = 4;
-            this.kernelSize.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
+            this.combinedSmoothing.Location = new System.Drawing.Point(8, 98);
+            this.combinedSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.combinedSmoothing.Name = "combinedSmoothing";
+            this.combinedSmoothing.Size = new System.Drawing.Size(148, 28);
+            this.combinedSmoothing.TabIndex = 6;
+            this.combinedSmoothing.Text = "Combined";
+            this.combinedSmoothing.UseVisualStyleBackColor = true;
+            this.combinedSmoothing.CheckedChanged += new System.EventHandler(this.combinedSmoothing_CheckedChanged);
             // 
             // CoreForm
             // 
@@ -987,8 +1000,9 @@ namespace WorldHeightmap.Client
             this.roundSettings.ResumeLayout(false);
             this.roundSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.roundToNearest)).EndInit();
-            this.averageSettings.ResumeLayout(false);
-            this.averageSettings.PerformLayout();
+            this.normalSettings.ResumeLayout(false);
+            this.normalSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.kernelSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fwhmCounter)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.averagePasses)).EndInit();
             this.smoothingOptionsBox.ResumeLayout(false);
@@ -1020,7 +1034,6 @@ namespace WorldHeightmap.Client
             ((System.ComponentModel.ISupportInitialize)(this.resultDisplay)).EndInit();
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kernelSize)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1069,8 +1082,8 @@ namespace WorldHeightmap.Client
         private System.Windows.Forms.GroupBox smoothingOptionsBox;
         private System.Windows.Forms.RadioButton noSmoothing;
         private System.Windows.Forms.RadioButton roundSmoothing;
-        private System.Windows.Forms.RadioButton averageSmoothing;
-        private System.Windows.Forms.GroupBox averageSettings;
+        private System.Windows.Forms.RadioButton normalSmoothing;
+        private System.Windows.Forms.GroupBox normalSettings;
         private System.Windows.Forms.Label averagePassesLabel;
         private System.Windows.Forms.NumericUpDown averagePasses;
         private System.Windows.Forms.GroupBox roundSettings;
@@ -1094,6 +1107,7 @@ namespace WorldHeightmap.Client
         private System.Windows.Forms.NumericUpDown roundToNearest;
         private System.Windows.Forms.Label kernelSizeLabel;
         private System.Windows.Forms.NumericUpDown kernelSize;
+        private System.Windows.Forms.RadioButton combinedSmoothing;
     }
 }
 

@@ -117,7 +117,7 @@ namespace WorldHeightmapCore.Models
             return this;
         }
 
-        public GeneratorRequestBuilder WithAverageSmoothing(int passes, int fwhm, int kernelSize)
+        public GeneratorRequestBuilder WithNormalSmoothing(int passes, int fwhm, int kernelSize)
         {
             if (kernelSize % 2 != 1 || kernelSize <= 1)
                 throw new ArgumentException("Size must be odd and larger than 1.", nameof(kernelSize));

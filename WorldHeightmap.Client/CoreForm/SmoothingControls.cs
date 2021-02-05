@@ -11,19 +11,24 @@ namespace WorldHeightmap.Client
         private void AverageSmoothing_CheckedChanged(object sender, EventArgs e)
         {
             roundSettings.Enabled = false;
-            averageSettings.Enabled = true;
+            normalSettings.Enabled = true;
         }
 
         private void RoundSmoothing_CheckedChanged(object sender, EventArgs e)
         {
             roundSettings.Enabled = true;
-            averageSettings.Enabled = false;
+            normalSettings.Enabled = false;
         }
 
         private void NoSmoothing_CheckedChanged(object sender, EventArgs e)
         {
             roundSettings.Enabled = false;
-            averageSettings.Enabled = false;
+            normalSettings.Enabled = false;
+        }
+
+        private void combinedSmoothing_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

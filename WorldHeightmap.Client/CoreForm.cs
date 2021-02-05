@@ -245,11 +245,11 @@ namespace WorldHeightmap.Client
                 builder.WithNoSmoothing();
             else if (roundSmoothing.Checked)
                 builder.WithRoundSmoothing((float)roundToNearest.Value);
-            else if (averageSmoothing.Checked)
+            else if (normalSmoothing.Checked)
             {
                 try
                 {
-                    builder.WithAverageSmoothing((int)averagePasses.Value, (int)fwhmCounter.Value, (int)kernelSize.Value);
+                    builder.WithNormalSmoothing((int)averagePasses.Value, (int)fwhmCounter.Value, (int)kernelSize.Value);
                 }
                 catch (ArgumentException ae)
                 {
