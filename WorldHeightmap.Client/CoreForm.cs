@@ -341,5 +341,10 @@ namespace WorldHeightmap.Client
             if (heightSame.Checked)
                 mapHeight.SelectedIndex = mapWidth.SelectedIndex;
         }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

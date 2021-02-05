@@ -56,6 +56,7 @@ namespace WorldHeightmap.Client
             this.averagePassesLabel = new System.Windows.Forms.Label();
             this.averagePasses = new System.Windows.Forms.NumericUpDown();
             this.smoothingOptionsBox = new System.Windows.Forms.GroupBox();
+            this.combinedSmoothing = new System.Windows.Forms.RadioButton();
             this.noSmoothing = new System.Windows.Forms.RadioButton();
             this.roundSmoothing = new System.Windows.Forms.RadioButton();
             this.normalSmoothing = new System.Windows.Forms.RadioButton();
@@ -88,13 +89,13 @@ namespace WorldHeightmap.Client
             this.operationsPanel = new System.Windows.Forms.SplitContainer();
             this.resultSection = new System.Windows.Forms.SplitContainer();
             this.resultDisplay = new System.Windows.Forms.PictureBox();
+            this.saveButton = new System.Windows.Forms.Button();
             this.loggerView = new System.Windows.Forms.ListView();
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.opeartionStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.globalStatus = new System.Windows.Forms.ToolStripProgressBar();
             this.groupStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.groupStatus = new System.Windows.Forms.ToolStripProgressBar();
-            this.combinedSmoothing = new System.Windows.Forms.RadioButton();
             this.settingsBox.SuspendLayout();
             this.dataTab.SuspendLayout();
             this.liveDataTab.SuspendLayout();
@@ -519,9 +520,22 @@ namespace WorldHeightmap.Client
             this.smoothingOptionsBox.TabStop = false;
             this.smoothingOptionsBox.Text = "Smoothing";
             // 
+            // combinedSmoothing
+            // 
+            this.combinedSmoothing.Checked = true;
+            this.combinedSmoothing.Location = new System.Drawing.Point(8, 30);
+            this.combinedSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.combinedSmoothing.Name = "combinedSmoothing";
+            this.combinedSmoothing.Size = new System.Drawing.Size(148, 28);
+            this.combinedSmoothing.TabIndex = 6;
+            this.combinedSmoothing.TabStop = true;
+            this.combinedSmoothing.Text = "Combined";
+            this.combinedSmoothing.UseVisualStyleBackColor = true;
+            this.combinedSmoothing.CheckedChanged += new System.EventHandler(this.CombinedSmoothing_CheckedChanged);
+            // 
             // noSmoothing
             // 
-            this.noSmoothing.Location = new System.Drawing.Point(9, 132);
+            this.noSmoothing.Location = new System.Drawing.Point(8, 132);
             this.noSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.noSmoothing.Name = "noSmoothing";
             this.noSmoothing.Size = new System.Drawing.Size(148, 28);
@@ -532,7 +546,7 @@ namespace WorldHeightmap.Client
             // 
             // roundSmoothing
             // 
-            this.roundSmoothing.Location = new System.Drawing.Point(8, 64);
+            this.roundSmoothing.Location = new System.Drawing.Point(8, 98);
             this.roundSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.roundSmoothing.Name = "roundSmoothing";
             this.roundSmoothing.Size = new System.Drawing.Size(148, 28);
@@ -543,13 +557,11 @@ namespace WorldHeightmap.Client
             // 
             // normalSmoothing
             // 
-            this.normalSmoothing.Checked = true;
-            this.normalSmoothing.Location = new System.Drawing.Point(8, 30);
+            this.normalSmoothing.Location = new System.Drawing.Point(8, 64);
             this.normalSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.normalSmoothing.Name = "normalSmoothing";
             this.normalSmoothing.Size = new System.Drawing.Size(148, 28);
             this.normalSmoothing.TabIndex = 3;
-            this.normalSmoothing.TabStop = true;
             this.normalSmoothing.Text = "Normal";
             this.normalSmoothing.UseVisualStyleBackColor = true;
             this.normalSmoothing.CheckedChanged += new System.EventHandler(this.AverageSmoothing_CheckedChanged);
@@ -745,7 +757,7 @@ namespace WorldHeightmap.Client
             // automaticWater
             // 
             this.automaticWater.Checked = true;
-            this.automaticWater.Location = new System.Drawing.Point(105, 21);
+            this.automaticWater.Location = new System.Drawing.Point(7, 22);
             this.automaticWater.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.automaticWater.Name = "automaticWater";
             this.automaticWater.Size = new System.Drawing.Size(93, 20);
@@ -756,7 +768,7 @@ namespace WorldHeightmap.Client
             // 
             // flattenWater
             // 
-            this.flattenWater.Location = new System.Drawing.Point(7, 21);
+            this.flattenWater.Location = new System.Drawing.Point(108, 22);
             this.flattenWater.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.flattenWater.Name = "flattenWater";
             this.flattenWater.Size = new System.Drawing.Size(75, 20);
@@ -903,6 +915,7 @@ namespace WorldHeightmap.Client
             // 
             // resultSection.Panel2
             // 
+            this.resultSection.Panel2.Controls.Add(this.saveButton);
             this.resultSection.Panel2.Controls.Add(this.manualWaterBox);
             this.resultSection.Size = new System.Drawing.Size(909, 431);
             this.resultSection.SplitterDistance = 429;
@@ -920,6 +933,16 @@ namespace WorldHeightmap.Client
             this.resultDisplay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.resultDisplay.TabIndex = 0;
             this.resultDisplay.TabStop = false;
+            // 
+            // saveButton
+            // 
+            this.saveButton.Location = new System.Drawing.Point(254, 384);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(213, 40);
+            this.saveButton.TabIndex = 15;
+            this.saveButton.Text = "Save";
+            this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
             // loggerView
             // 
@@ -967,17 +990,6 @@ namespace WorldHeightmap.Client
             // 
             this.groupStatus.Name = "groupStatus";
             this.groupStatus.Size = new System.Drawing.Size(117, 18);
-            // 
-            // combinedSmoothing
-            // 
-            this.combinedSmoothing.Location = new System.Drawing.Point(8, 98);
-            this.combinedSmoothing.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.combinedSmoothing.Name = "combinedSmoothing";
-            this.combinedSmoothing.Size = new System.Drawing.Size(148, 28);
-            this.combinedSmoothing.TabIndex = 6;
-            this.combinedSmoothing.Text = "Combined";
-            this.combinedSmoothing.UseVisualStyleBackColor = true;
-            this.combinedSmoothing.CheckedChanged += new System.EventHandler(this.CombinedSmoothing_CheckedChanged);
             // 
             // CoreForm
             // 
@@ -1108,6 +1120,7 @@ namespace WorldHeightmap.Client
         private System.Windows.Forms.Label kernelSizeLabel;
         private System.Windows.Forms.NumericUpDown kernelSize;
         private System.Windows.Forms.RadioButton combinedSmoothing;
+        private System.Windows.Forms.Button saveButton;
     }
 }
 
