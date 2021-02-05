@@ -54,7 +54,7 @@ namespace WorldHeightmapCore.Services
                 elevationPoints = await _elevation.GetElevationData(roundedPoints);
             }
 
-            var heightmapPoints = ConvertElevationToHeightmapValues(elevationPoints, request, out var waterHeight);
+            var heightmapPoints = ConvertElevationToHeightmapValues(elevationPoints, request);
 
             SquashPoints(heightmapPoints, request);
 
@@ -64,7 +64,7 @@ namespace WorldHeightmapCore.Services
             if (GetMinMax(elevationPoints).Item1 >= 0.0)
                 water = (0, 0, 0);
             else
-                water = GetWaterHeights(heightmapPoints, waterHeight);
+                water = GetWaterHeights(heightmapPoints, elevationPoints);
 
             var rotatedPoints = RotatePoints(heightmapPoints);
 
@@ -82,7 +82,7 @@ namespace WorldHeightmapCore.Services
             };
         }
 
-        private void SmoothPoints(double[,] data, GeneratorRequest request)
+        private static void SmoothPoints(double[,] data, GeneratorRequest request)
         {
             switch(request.SmoothingOptions)
             {
@@ -93,10 +93,15 @@ namespace WorldHeightmapCore.Services
                 case Smoothing.Round:
                     RoundPoints(data, request.RoundSmoothingNearest);
                     break;
+                case Smoothing.Combined:
+                    RoundPoints(data, request.RoundSmoothingNearest);
+                    for (int i = 0; i < request.AverageSmoothingPasses; i++)
+                        AveragePoints(data, request.SmoothFWHM, request.KernelSize);
+                    break;
             }
         }
 
-        private void AveragePoints(double[,] data, int fwhm, int size)
+        private static void AveragePoints(double[,] data, int fwhm, int size)
         {
             var output = new double[data.GetLength(0), data.GetLength(1)];
 
@@ -135,17 +140,17 @@ namespace WorldHeightmapCore.Services
             data.Map(output, 0, 0);
         }
 
-        public double FwhmToSigma(double fwhm)
+        public static double FwhmToSigma(double fwhm)
         {
             return fwhm / Math.Sqrt(8 * Math.Log(2));
         }
 
-        public double SigmaToFwhm(double sigma)
+        public static double SigmaToFwhm(double sigma)
         {
             return sigma * Math.Sqrt(8 * Math.Log(2));
         }
 
-        public double[,] GetWeights(int size, double fwhm)
+        public static double[,] GetWeights(int size, double fwhm)
         {
             double[,] kernels = new double[size, size];
 
@@ -171,22 +176,10 @@ namespace WorldHeightmapCore.Services
                 }
             }
 
-            //var sigma = FwhmToSigma(fwhm);
-
-            //var half = size / 2;
-
-            //for (int i = 0; i < size; i++)
-            //    kernels[i] = Math.Exp(-Math.Pow((i - half), 2.0) / (2 * Math.Pow(sigma, 2.0)));
-
-            //double sum = kernels.Sum();
-
-            //for (int i = 0; i < kernels.Length; i++)
-            //    kernels[i] /= sum;
-
             return kernels;
         }
 
-        private double GetSmoothedValue(double[,] weights, double[,] values)
+        private static double GetSmoothedValue(double[,] weights, double[,] values)
         {
             double sum = 0.0;
 
@@ -197,7 +190,7 @@ namespace WorldHeightmapCore.Services
             return sum;
         }
 
-        private double[,] GetDistanceFromCenter(double[,] data)
+        private static double[,] GetDistanceFromCenter(double[,] data)
         {
             var w = data.GetLength(0);
             var h = data.GetLength(1);
@@ -214,7 +207,7 @@ namespace WorldHeightmapCore.Services
             return output;
         }
 
-        private double AverageDistanceFromCenter(double[,] data)
+        private static double AverageDistanceFromCenter(double[,] data)
         {
             List<double> distances = new List<double>();
             var center = data[data.GetLength(0) / 2, data.GetLength(1) / 2];
@@ -230,7 +223,7 @@ namespace WorldHeightmapCore.Services
             return distances.Average();
         }
 
-        private void RoundPoints(double[,] data, float roundTo)
+        private static void RoundPoints(double[,] data, float roundTo)
         {
             var comp = roundTo / 2;
             for (int x = 0; x < data.GetLength(0); x++)
@@ -247,7 +240,7 @@ namespace WorldHeightmapCore.Services
             }
         }
 
-        private void SquashPoints(double[,] data, GeneratorRequest request)
+        private static void SquashPoints(double[,] data, GeneratorRequest request)
         {
             switch(request.SquashOption)
             {
@@ -261,7 +254,7 @@ namespace WorldHeightmapCore.Services
             }
         }
 
-        private void CompressPoints(double[,] data)
+        private static void CompressPoints(double[,] data)
         {
             var avgabove = GetAvgHeightAboveFifty(data);
             var mod = 1 - avgabove;
@@ -271,7 +264,7 @@ namespace WorldHeightmapCore.Services
                         data[x, y] *= mod;
         }
 
-        private double GetAvgHeightAboveFifty(double[,] data)
+        private static double GetAvgHeightAboveFifty(double[,] data)
         {
             double avg = 0;
             int i = 0;
@@ -292,7 +285,7 @@ namespace WorldHeightmapCore.Services
             return avg;
         }
 
-        private void FlattenPoints(double[,] data, double min, double max)
+        private static void FlattenPoints(double[,] data, double min, double max)
         {
             for (int x = 0; x < data.GetLength(0); x++)
                 for (int y = 0; y < data.GetLength(1); y++)
@@ -302,7 +295,7 @@ namespace WorldHeightmapCore.Services
                         data[x, y] = max;
         }
 
-        private double[,] RotatePoints(double[,] data)
+        private static double[,] RotatePoints(double[,] data)
         {
             var xw = data.GetLength(0);
             var yw = data.GetLength(1);
@@ -325,7 +318,7 @@ namespace WorldHeightmapCore.Services
             return output;
         }
 
-        private (byte[], Bitmap) GetHeightmapByteArray(double[,] data, GeneratorRequest request)
+        private static (byte[], Bitmap) GetHeightmapByteArray(double[,] data, GeneratorRequest request)
         {
             //var stride = request.Width * 2;
 
@@ -387,37 +380,56 @@ namespace WorldHeightmapCore.Services
             }
         }
 
-        private (double, double, double) GetWaterHeights(double[,] sqished, double waterHeight)
+        private static (double, double, double) GetWaterHeights(double[,] final, double[,] rawData)
         {
             double depthHeight = 0.0;
             double abyssHeight = 0.0;
 
-            if(waterHeight != 0.0)
-            {
-                var waterPoints = GetAllPointsBelow(sqished, waterHeight);
+            var percent = GetPercentWater(rawData);
+            var waterHeight = GetValueOfPercent(percent, final);
 
-                if(waterPoints.Count <= 0)
-                    return (waterHeight, depthHeight, abyssHeight);
+            var waterPoints = GetAllPointsBelow(final, waterHeight);
 
-                waterPoints.Sort();
+            if(waterPoints.Count <= 0)
+                return (waterHeight, depthHeight, abyssHeight);
 
-                var thirtythird = .33 * waterPoints.Count;
+            waterPoints.Sort();
 
-                var rtt = (int)Math.Round(thirtythird);
+            var thirtythird = .33 * waterPoints.Count;
 
-                abyssHeight = waterPoints[rtt];
+            var rtt = (int)Math.Round(thirtythird);
 
-                var sixtysix = .66 * waterPoints.Count;
+            abyssHeight = waterPoints[rtt];
 
-                var rss = (int)Math.Round(sixtysix);
+            var sixtysix = .66 * waterPoints.Count;
 
-                depthHeight = waterPoints[rss];
-            }
+            var rss = (int)Math.Round(sixtysix);
+
+            depthHeight = waterPoints[rss];
 
             return (waterHeight, depthHeight, abyssHeight);
         }
 
-        private List<double> GetAllPointsBelow(double[,] data, double cap)
+        private static double GetValueOfPercent(double percent, double[,] data)
+        {
+            var minmax = GetMinMax(data);
+
+            var dif = minmax.Item2 - minmax.Item1;
+
+            return percent * dif;
+        }
+
+        private static double GetPercentWater(double[,] rawData)
+        {
+            var minmax = GetMinMax(rawData);
+
+            var bot = Math.Abs(minmax.Item1);
+            var dif = minmax.Item2 - minmax.Item1;
+
+            return bot / dif;
+        }
+
+        private static List<double> GetAllPointsBelow(double[,] data, double cap)
         {
             List<double> output = new List<double>();
             for (int x = 0; x < data.GetLength(0); x++)
@@ -432,7 +444,7 @@ namespace WorldHeightmapCore.Services
             return output;
         }
 
-        private double[,] ConvertElevationToHeightmapValues(double[,] elevation, GeneratorRequest request, out double waterHeight)
+        private static double[,] ConvertElevationToHeightmapValues(double[,] elevation, GeneratorRequest request)
         {
             // Get the average distance from zero ...
             var average = GetAverageDistFromZero(elevation);
@@ -449,12 +461,9 @@ namespace WorldHeightmapCore.Services
                 case WaterType.Automatic:
                     // ... and zero the data set by shifting it by the inverse of the min ...
                     zeroedSet = ShiftPoints(squishedSet, -minmax.Item1);
-
-                    waterHeight = Math.Abs(minmax.Item1);
                     break;
                 case WaterType.Flatten:
                     zeroedSet = DropNegatives(squishedSet);
-                    waterHeight = 0.0;
                     break;
                 default:
                     throw new ArgumentNullException(nameof(request.WaterOption), "Water Option can't be null");
@@ -463,7 +472,7 @@ namespace WorldHeightmapCore.Services
             return zeroedSet;
         }
 
-        private double[,] DropNegatives(double[,] squished)
+        private static double[,] DropNegatives(double[,] squished)
         {
             var xw = squished.GetLength(0);
             var yw = squished.GetLength(1);
@@ -483,7 +492,7 @@ namespace WorldHeightmapCore.Services
             return data;
         }
 
-        private double[,] SquishPoints(double[,] shifted, int squish, double goalpoint)
+        private static double[,] SquishPoints(double[,] shifted, int squish, double goalpoint)
         {
             var xw = shifted.GetLength(0);
             var yw = shifted.GetLength(1);
@@ -513,7 +522,7 @@ namespace WorldHeightmapCore.Services
             return data;
         }
 
-        private (double, double) GetBelowAboveAverages(double[,] data)
+        private static (double, double) GetBelowAboveAverages(double[,] data)
         {
             var counts = GetAboveBelowZeroCounts(data);
 
@@ -523,7 +532,7 @@ namespace WorldHeightmapCore.Services
             return (below, above);
         }
 
-        private double GetBelowThreshold(double[,] data, double goalpoint)
+        private static double GetBelowThreshold(double[,] data, double goalpoint)
         {
             var goals = GetThresholdGoals(data, goalpoint);
 
@@ -544,7 +553,7 @@ namespace WorldHeightmapCore.Services
             return reachedgoalpercent;
         }
 
-        private (double, double) GetThresholdGoals(double[,] data, double goalpoint)
+        private static (double, double) GetThresholdGoals(double[,] data, double goalpoint)
         {
             var counts = GetAboveBelowZeroCounts(data);
 
@@ -556,7 +565,7 @@ namespace WorldHeightmapCore.Services
             return (mingoal, maxgoal);
         }
 
-        private (double, double) GetMinMax(double[,] set)
+        private static (double, double) GetMinMax(double[,] set)
         {
             double max = set[0, 0];
             double min = set[0, 0];
@@ -576,7 +585,7 @@ namespace WorldHeightmapCore.Services
             return (min, max);
         }
 
-        private (int, int) GetAboveBelowZeroCounts(double[,] set)
+        private static (int, int) GetAboveBelowZeroCounts(double[,] set)
         {
             int above = 0;
             int below = 0;
@@ -595,7 +604,7 @@ namespace WorldHeightmapCore.Services
             return (below, above);
         }
 
-        private double[,] ShiftPoints(double[,] elevation, double shift)
+        private static double[,] ShiftPoints(double[,] elevation, double shift)
         {
             var xw = elevation.GetLength(0);
             var yw = elevation.GetLength(1);
@@ -612,7 +621,7 @@ namespace WorldHeightmapCore.Services
             return data;
         }
 
-        private double GetAverageDistFromZero(double[,] elevation)
+        private static double GetAverageDistFromZero(double[,] elevation)
         {
             int c = 0;
             int splits = 0;
@@ -647,7 +656,7 @@ namespace WorldHeightmapCore.Services
             return average;
         }
 
-        private async Task<double[,]> ReadElevationDatasetAsync(string file, int width, int height)
+        private static async Task<double[,]> ReadElevationDatasetAsync(string file, int width, int height)
         {
             string data;
             using (FileStream fs = new FileStream(file, FileMode.Open))
@@ -690,7 +699,7 @@ namespace WorldHeightmapCore.Services
             return output;
         }
 
-        private GlobalPosition[,] GetElevationPoints(GeneratorRequest request)
+        private static GlobalPosition[,] GetElevationPoints(GeneratorRequest request)
         {
             var initial = new GlobalPosition()
             {
@@ -705,7 +714,7 @@ namespace WorldHeightmapCore.Services
             return points;
         }
 
-        private GlobalPosition[,] BuildPointsList(GeneratorRequest request, GlobalPosition initial, GlobalPosition[] bounds)
+        private static GlobalPosition[,] BuildPointsList(GeneratorRequest request, GlobalPosition initial, GlobalPosition[] bounds)
         {
             // counts down the width, then over one col, etc....
 
@@ -723,7 +732,7 @@ namespace WorldHeightmapCore.Services
             return points;
         }
 
-        private GlobalPosition[,] BuildOffsetTree(GlobalPosition initial, double width, double height, GeneratorRequest request)
+        private static GlobalPosition[,] BuildOffsetTree(GlobalPosition initial, double width, double height, GeneratorRequest request)
         {
             var xSplit = width / request.Width;
             var ySplit = height / request.Height;
@@ -751,7 +760,7 @@ namespace WorldHeightmapCore.Services
             return tree;
         }
 
-        private GlobalPosition[] GetBounds(GlobalPosition initial, int realWidth, int realHeight)
+        private static GlobalPosition[] GetBounds(GlobalPosition initial, int realWidth, int realHeight)
         {
             GlobalPosition[] bounds = new GlobalPosition[2];
 

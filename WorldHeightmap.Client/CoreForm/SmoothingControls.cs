@@ -26,9 +26,10 @@ namespace WorldHeightmap.Client
             normalSettings.Enabled = false;
         }
 
-        private void combinedSmoothing_CheckedChanged(object sender, EventArgs e)
+        private void CombinedSmoothing_CheckedChanged(object sender, EventArgs e)
         {
-
+            roundSettings.Enabled = true;
+            normalSettings.Enabled = true;
         }
     }
 }

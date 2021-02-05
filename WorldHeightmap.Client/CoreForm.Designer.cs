@@ -977,7 +977,7 @@ namespace WorldHeightmap.Client
             this.combinedSmoothing.TabIndex = 6;
             this.combinedSmoothing.Text = "Combined";
             this.combinedSmoothing.UseVisualStyleBackColor = true;
-            this.combinedSmoothing.CheckedChanged += new System.EventHandler(this.combinedSmoothing_CheckedChanged);
+            this.combinedSmoothing.CheckedChanged += new System.EventHandler(this.CombinedSmoothing_CheckedChanged);
             // 
             // CoreForm
             // 

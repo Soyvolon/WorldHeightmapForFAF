@@ -44,6 +44,7 @@ namespace WorldHeightmapCore.Models
     {
         Average,
         Round,
+        Combined,
         None
     }
 }

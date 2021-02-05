@@ -136,6 +136,15 @@ namespace WorldHeightmapCore.Models
             return this;
         }
 
+        public GeneratorRequestBuilder WithCombinedSmoothing(float nearest, int passes, int fwhm, int kernelSize)
+        {
+            WithNormalSmoothing(passes, fwhm, kernelSize)
+                .WithRoundSmoothing(nearest);
+
+            SmoothingOptions = Smoothing.Combined;
+            return this;
+        }
+
         public GeneratorRequestBuilder WithNoSmoothing()
         {
             SmoothingOptions = Smoothing.None;
