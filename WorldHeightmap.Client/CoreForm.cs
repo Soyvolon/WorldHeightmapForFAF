@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -138,32 +139,36 @@ namespace WorldHeightmap.Client
             await File.WriteAllLinesAsync(path, file);
         }
 
-        public static async Task SaveGeneratorResultsAsync(GeneratorResult result, string folder)
+        public async Task SaveGeneratorResultsAsync(GeneratorResult result, string folder, string name = "generator_result", bool includeExtraData = false)
         {
-            using FileStream fs = new(Path.Join(folder, "testoutput.raw"), FileMode.Create, FileAccess.Write);
+            using FileStream fs = new(Path.Join(folder, $"{name}.raw"), FileMode.Create, FileAccess.Write);
             using BinaryWriter w = new(fs);
 
             w.Write(result.Heightmap);
 
             //await File.WriteAllBytesAsync(Path.Join(folder, @"testoutput.raw"), result.Heightmap);
 
-            result.HeightmapBitmap.Save(Path.Join(folder, "testoutput.bmp"), ImageFormat.Bmp);
+            if (includeExtraData)
+            {
+                if(resultDisplay.Image is not null)
+                    resultDisplay.Image.Save(Path.Join(folder, "display_image.bmp"), ImageFormat.Bmp);
 
-            var xw = result.ModifedElevationData.GetLength(0);
-            var yw = result.ModifedElevationData.GetLength(1);
-            List<string> dat = new();
-            for (int x = 0; x < xw; x++)
-                for (int y = 0; y < yw; y++)
-                    dat.Add($"({x}, {y}): {result.ModifedElevationData[x, y]}");
+                var xw = result.ModifedElevationData.GetLength(0);
+                var yw = result.ModifedElevationData.GetLength(1);
+                List<string> dat = new();
+                for (int x = 0; x < xw; x++)
+                    for (int y = 0; y < yw; y++)
+                        dat.Add($"({x}, {y}): {result.ModifedElevationData[x, y]}");
 
-            await File.WriteAllLinesAsync(Path.Join(folder, "modified_elevation_data.txt"), dat);
+                await File.WriteAllLinesAsync(Path.Join(folder, "modified_elevation_data.txt"), dat);
 
-            dat = new();
-            for (int x = 0; x < xw; x++)
-                for (int y = 0; y < yw; y++)
-                    dat.Add($"({x}, {y}): {result.RawElevationData[x, y]}");
+                dat = new();
+                for (int x = 0; x < xw; x++)
+                    for (int y = 0; y < yw; y++)
+                        dat.Add($"({x}, {y}): {result.RawElevationData[x, y]}");
 
-            await File.WriteAllLinesAsync(Path.Join(folder, "raw_elevation_data.txt"), dat);
+                await File.WriteAllLinesAsync(Path.Join(folder, "raw_elevation_data.txt"), dat);
+            }
         }
 
         private async void GenerateButton_ClickAsync(object sender, System.EventArgs e)
@@ -260,17 +265,39 @@ namespace WorldHeightmap.Client
 
             builder.WithSquishPercent((int)squishPercent.Value);
 
-            var result = await _heightmap.GenerateHeightmap(builder.Build());
-
-            await SaveDatasetAsync(Path.Join(USER_FILES, "Temp.whcd"), "[TEMP] Last Dataset Run", result);
-            await SaveGeneratorResultsAsync(result, "Data");
-
-            resultDisplay.Image = result.HeightmapBitmap;
-            resultDisplay.Refresh();
+            var request = builder.Build();
+            var result = await _heightmap.GenerateHeightmap(request);
 
             waterElevation.Value = (decimal)result.WaterHeight;
             depthElevation.Value = (decimal)result.DepthHeight;
             abyssElevation.Value = (decimal)result.AbyssHeight;
+
+            _ = Task.Run(async () => await DisplayImage(result.Heightmap, request));
+            _ = Task.Run(async () => await SaveDatasetAsync(Path.Join(USER_FILES, "Temp.whcd"), "[TEMP] Last Dataset Run", result));
+        }
+
+        public Task DisplayImage(byte[] bytes, GeneratorRequest request)
+        {
+            Bitmap bmp = new Bitmap(request.Width, request.Height, PixelFormat.Format16bppRgb565);
+            // Lock the bits
+            Rectangle bounds = new Rectangle(0, 0, request.Width, request.Height);
+            BitmapData bmpData = bmp.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
+            IntPtr ptrToFirstPixel = bmpData.Scan0;
+
+            byte[] buffer = new byte[request.Height * bmpData.Stride];
+
+            for (int y = 0; y < request.Height; y++)
+            {
+                Buffer.BlockCopy(bytes, y * request.Width * 2, buffer, y * bmpData.Stride, request.Width * 2);
+            }
+
+            Marshal.Copy(buffer, 0, ptrToFirstPixel, buffer.Length);
+            bmp.UnlockBits(bmpData);
+
+            resultDisplay.Image = bmp;
+            resultDisplay.Refresh();
+
+            return Task.CompletedTask;
         }
 
         public static int GetSizeValue(int index)

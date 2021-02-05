@@ -75,8 +75,7 @@ namespace WorldHeightmapCore.Services
                 WaterHeight = water.Item1,
                 DepthHeight = water.Item2,
                 AbyssHeight = water.Item3,
-                Heightmap = heightmap.Item1,
-                HeightmapBitmap = heightmap.Item2,
+                Heightmap = heightmap,
                 RawElevationData = elevationPoints,
                 ModifedElevationData = rotatedPoints
             };
@@ -318,7 +317,7 @@ namespace WorldHeightmapCore.Services
             return output;
         }
 
-        private static (byte[], Bitmap) GetHeightmapByteArray(double[,] data, GeneratorRequest request)
+        private static byte[] GetHeightmapByteArray(double[,] data, GeneratorRequest request)
         {
             //var stride = request.Width * 2;
 
@@ -359,23 +358,7 @@ namespace WorldHeightmapCore.Services
                         }
                     }
 
-                    Bitmap bmp = new Bitmap(request.Width, request.Height, PixelFormat.Format16bppRgb565);
-                    // Lock the bits
-                    Rectangle bounds = new Rectangle(0, 0, request.Width, request.Height);
-                    BitmapData bmpData = bmp.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format16bppRgb565);
-                    IntPtr ptrToFirstPixel = bmpData.Scan0;
-
-                    byte[] buffer = new byte[request.Height * bmpData.Stride];
-
-                    for (int y = 0; y < request.Height; y++)
-                    {
-                        Buffer.BlockCopy(bytes, y * request.Width * 2, buffer, y * bmpData.Stride, request.Width * 2);
-                    }
-
-                    Marshal.Copy(buffer, 0, ptrToFirstPixel, buffer.Length);
-                    bmp.UnlockBits(bmpData);
-
-                    return (bytes, bmp);
+                    return bytes;
                 }
             }
         }

@@ -11,7 +11,6 @@ namespace WorldHeightmapCore.Models
     public class GeneratorResult
     {
         public byte[] Heightmap { get; internal set; }
-        public Bitmap HeightmapBitmap { get; internal set; }
         public double[,] RawElevationData { get; internal set; }
         public double[,] ModifedElevationData { get; internal set; }
         public double WaterHeight { get; internal set; }
