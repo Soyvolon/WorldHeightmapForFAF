@@ -5,15 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 
-using WorldHeightmapCore.Http;
-using WorldHeightmapCore.Models;
+using WorldHeightmap.Core.Http;
+using WorldHeightmap.Core.Models;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using WorldHeightmapCore.Extensions;
+using WorldHeightmap.Core.Extensions;
 
-namespace WorldHeightmapCore.Services
+namespace WorldHeightmap.Core.Services
 {
     public class HeightmapGeneratorService
     {

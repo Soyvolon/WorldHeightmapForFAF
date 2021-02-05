@@ -345,7 +345,6 @@ namespace WorldHeightmap.Client
             // 
             this.roundSettings.Controls.Add(this.roundToNearest);
             this.roundSettings.Controls.Add(this.roundToNearestLabel);
-            this.roundSettings.Enabled = false;
             this.roundSettings.Location = new System.Drawing.Point(173, 596);
             this.roundSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.roundSettings.Name = "roundSettings";
@@ -913,10 +912,11 @@ namespace WorldHeightmap.Client
             // 
             this.resultSection.Panel1.Controls.Add(this.resultDisplay);
             // 
-            // resultSection.Panel2
+            // resultSection.resultOptionsPanel
             // 
             this.resultSection.Panel2.Controls.Add(this.saveButton);
             this.resultSection.Panel2.Controls.Add(this.manualWaterBox);
+            this.resultSection.Panel2.Enabled = false;
             this.resultSection.Size = new System.Drawing.Size(909, 431);
             this.resultSection.SplitterDistance = 429;
             this.resultSection.SplitterWidth = 9;

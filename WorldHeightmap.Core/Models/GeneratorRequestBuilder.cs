@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace WorldHeightmapCore.Models
+namespace WorldHeightmap.Core.Models
 {
     public class GeneratorRequestBuilder
     {

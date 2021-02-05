@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-namespace WorldHeightmapCore.Models
+namespace WorldHeightmap.Core.Models
 {
     public class GlobalPosition : IEquatable<GlobalPosition>
     {

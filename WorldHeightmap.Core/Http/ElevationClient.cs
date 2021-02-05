@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 using Soyvolon.Utilities.Data;
 
-using WorldHeightmapCore.Models;
+using WorldHeightmap.Core.Models;
 
-namespace WorldHeightmapCore.Http
+namespace WorldHeightmap.Core.Http
 {
     public class ElevationClient
     {

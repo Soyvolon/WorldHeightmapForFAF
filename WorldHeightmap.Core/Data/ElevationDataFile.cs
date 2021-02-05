@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorldHeightmapCore.Data
+namespace WorldHeightmap.Core.Data
 {
     public class ElevationDataFile
     {

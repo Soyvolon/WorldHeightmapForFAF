@@ -7,11 +7,14 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using Microsoft.Extensions.DependencyInjection;
+
+using WorldHeightmap.Client.Popups;
 using WorldHeightmap.Client.Properties;
 
-using WorldHeightmapCore.Data;
-using WorldHeightmapCore.Models;
-using WorldHeightmapCore.Services;
+using WorldHeightmap.Core.Data;
+using WorldHeightmap.Core.Models;
+using WorldHeightmap.Core.Services;
 
 namespace WorldHeightmap.Client
 {
@@ -26,6 +29,7 @@ namespace WorldHeightmap.Client
             {
                 this._form = form;
                 _form.settingsBox.Enabled = false;
+                _form.resultSection.Panel2.Enabled = false;
             }
 
             protected virtual void Dispose(bool disposing)
@@ -38,6 +42,7 @@ namespace WorldHeightmap.Client
                     }
 
                     _form.settingsBox.Enabled = true;
+                    _form.resultSection.Panel2.Enabled = true;
                     disposedValue = true;
                 }
             }
@@ -52,18 +57,20 @@ namespace WorldHeightmap.Client
 
         private readonly IServiceProvider _services;
         private readonly HeightmapGeneratorService _heightmap;
+        private readonly GeneratorResultCacheService _cahce;
 
         public readonly string USER_FILES = "";
         public const string APP_FILES = "Data";
 
         private List<ElevationDataFile> ElevationDataFiles { get; init; }
 
-        public CoreForm(IServiceProvider services, HeightmapGeneratorService heightmap)
+        public CoreForm(IServiceProvider services, HeightmapGeneratorService heightmap, GeneratorResultCacheService cache)
         {
             USER_FILES = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "World Heightmap Generator");
 
             _services = services;
             _heightmap = heightmap;
+            _cahce = cache;
 
             InitializeComponent();
 
@@ -139,35 +146,51 @@ namespace WorldHeightmap.Client
             await File.WriteAllLinesAsync(path, file);
         }
 
-        public async Task SaveGeneratorResultsAsync(GeneratorResult result, string folder, string name = "generator_result", bool includeExtraData = false)
+        public async Task SaveGeneratorResultsAsync()
         {
-            using FileStream fs = new(Path.Join(folder, $"{name}.raw"), FileMode.Create, FileAccess.Write);
+            var lastResult = _cahce.GetResult();
+            if(lastResult is null)
+            {
+                MessageBox.Show("Run the generator before saving a result!", "No Result to Save", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var save = _services.GetRequiredService<SaveDataForm>();
+            var res = save.ShowDialog(this);
+
+            if (res == DialogResult.Abort || save.Aborted)
+                return;
+
+            using FileStream fs = new(Path.Join(save.Folder, $"{save.HeightmapName}.raw"), FileMode.Create, FileAccess.Write);
             using BinaryWriter w = new(fs);
 
-            w.Write(result.Heightmap);
+            w.Write(lastResult.Heightmap);
 
-            //await File.WriteAllBytesAsync(Path.Join(folder, @"testoutput.raw"), result.Heightmap);
+            if (save.SaveDataset)
+            {
+                await SaveDatasetAsync(Path.Join(USER_FILES, $"{save.ElevationDatasetName}.whcd"), save.ElevationDatasetName, lastResult);
+            }
 
-            if (includeExtraData)
+            if (save.SaveExtraData)
             {
                 if(resultDisplay.Image is not null)
-                    resultDisplay.Image.Save(Path.Join(folder, "display_image.bmp"), ImageFormat.Bmp);
+                    resultDisplay.Image.Save(Path.Join(save.Folder, $"{save.HeightmapName}.display_image.bmp"), ImageFormat.Bmp);
 
-                var xw = result.ModifedElevationData.GetLength(0);
-                var yw = result.ModifedElevationData.GetLength(1);
+                var xw = lastResult.ModifedElevationData.GetLength(0);
+                var yw = lastResult.ModifedElevationData.GetLength(1);
                 List<string> dat = new();
                 for (int x = 0; x < xw; x++)
                     for (int y = 0; y < yw; y++)
-                        dat.Add($"({x}, {y}): {result.ModifedElevationData[x, y]}");
+                        dat.Add($"({x}, {y}): {lastResult.ModifedElevationData[x, y]}");
 
-                await File.WriteAllLinesAsync(Path.Join(folder, "modified_elevation_data.txt"), dat);
+                await File.WriteAllLinesAsync(Path.Join(save.Folder, $"{save.HeightmapName}.modified_elevation_data.txt"), dat);
 
                 dat = new();
                 for (int x = 0; x < xw; x++)
                     for (int y = 0; y < yw; y++)
-                        dat.Add($"({x}, {y}): {result.RawElevationData[x, y]}");
+                        dat.Add($"({x}, {y}): {lastResult.RawElevationData[x, y]}");
 
-                await File.WriteAllLinesAsync(Path.Join(folder, "raw_elevation_data.txt"), dat);
+                await File.WriteAllLinesAsync(Path.Join(save.Folder, $"{save.HeightmapName}.raw_elevation_data.txt"), dat);
             }
         }
 
@@ -274,6 +297,8 @@ namespace WorldHeightmap.Client
 
             _ = Task.Run(async () => await DisplayImage(result.Heightmap, request));
             _ = Task.Run(async () => await SaveDatasetAsync(Path.Join(USER_FILES, "Temp.whcd"), "[TEMP] Last Dataset Run", result));
+
+            _cahce.SetResult(result);
         }
 
         public Task DisplayImage(byte[] bytes, GeneratorRequest request)
@@ -295,7 +320,7 @@ namespace WorldHeightmap.Client
             bmp.UnlockBits(bmpData);
 
             resultDisplay.Image = bmp;
-            resultDisplay.Refresh();
+            //resultDisplay.Refresh();
 
             return Task.CompletedTask;
         }
@@ -342,9 +367,8 @@ namespace WorldHeightmap.Client
                 mapHeight.SelectedIndex = mapWidth.SelectedIndex;
         }
 
-        private void SaveButton_Click(object sender, EventArgs e)
-        {
-
-        }
+        private async void SaveButton_Click(object sender, EventArgs e)
+            //=> _ = Task.Run(async () => await SaveGeneratorResultsAsync());
+            => await SaveGeneratorResultsAsync();
     }
 }

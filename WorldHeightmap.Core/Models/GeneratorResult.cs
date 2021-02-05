@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorldHeightmapCore.Models
+namespace WorldHeightmap.Core.Models
 {
     public class GeneratorResult
     {
@@ -16,5 +16,21 @@ namespace WorldHeightmapCore.Models
         public double WaterHeight { get; internal set; }
         public double DepthHeight { get; internal set; }
         public double AbyssHeight { get; internal set; }
+
+        public GeneratorResult Clone()
+        {
+            var res = new GeneratorResult()
+            {
+                WaterHeight = WaterHeight,
+                DepthHeight = DepthHeight,
+                AbyssHeight = AbyssHeight
+            };
+
+            res.Heightmap = (byte[])Heightmap.Clone();
+            res.RawElevationData = (double[,])RawElevationData.Clone();
+            res.ModifedElevationData = (double[,])ModifedElevationData.Clone();
+
+            return res;
+        }
     }
 }

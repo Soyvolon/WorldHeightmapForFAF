@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using WorldHeightmapCore.Models;
+using WorldHeightmap.Core.Models;
 
-namespace WorldHeightmapCore.Extensions
+namespace WorldHeightmap.Core.Extensions
 {
     public static class GlobalPositionExtenstions
     {

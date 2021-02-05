@@ -4,9 +4,8 @@ using System.Windows.Forms;
 using Microsoft.Extensions.DependencyInjection;
 
 using WorldHeightmap.Client.Popups;
-
-using WorldHeightmapCore.Http;
-using WorldHeightmapCore.Services;
+using WorldHeightmap.Core.Http;
+using WorldHeightmap.Core.Services;
 
 namespace WorldHeightmap.Client
 {
@@ -40,8 +39,10 @@ namespace WorldHeightmap.Client
         {
             services.AddSingleton<CoreForm>()
                 .AddSingleton<HeightmapGeneratorService>()
+                .AddSingleton<GeneratorResultCacheService>()
                 .AddTransient<ApiKeyForm>()
-                .AddTransient<EarthEngineForm>();
+                .AddTransient<EarthEngineForm>()
+                .AddTransient<SaveDataForm>();
 
             services.AddHttpClient<ElevationClient>();
         }
