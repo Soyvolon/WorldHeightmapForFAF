@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -62,7 +63,7 @@ namespace WorldHeightmap.Client
         public readonly string USER_FILES = "";
         public const string APP_FILES = "Data";
 
-        private List<ElevationDataFile> ElevationDataFiles { get; init; }
+        private BindingList<ElevationDataFile> ElevationDataFiles { get; init; }
 
         public CoreForm(IServiceProvider services, HeightmapGeneratorService heightmap, GeneratorResultCacheService cache)
         {
@@ -77,7 +78,7 @@ namespace WorldHeightmap.Client
             mapHeight.SelectedIndex = 3;
             mapWidth.SelectedIndex = 3;
 
-            ElevationDataFiles = LoadElevationData();
+            ElevationDataFiles = new(LoadElevationData());
             savedElevationBox.DataSource = ElevationDataFiles;
             ElevationDataFile source;
             savedElevationBox.DisplayMember = nameof(source.Display);
@@ -106,15 +107,8 @@ namespace WorldHeightmap.Client
                     using StreamReader sr = new(fs);
 
                     var first = sr.ReadLine();
-                    var data = first.Split(",");
                     // we assume the file is saved correctly.
-                    files.Add(new()
-                    {
-                        Display = data[0],
-                        Width = int.Parse(data[1]),
-                        Height = int.Parse(data[2]),
-                        Path = f
-                    });
+                    files.Add(LoadFile(first, f));
                 }
                 catch
                 {
@@ -126,7 +120,20 @@ namespace WorldHeightmap.Client
             return files;
         }
 
-        public async Task SaveDatasetAsync(string path, string name, GeneratorResult result)
+        private ElevationDataFile LoadFile(string firstLine, string path)
+        {
+            var data = firstLine.Split(",");
+
+            return new()
+            {
+                Display = data[0],
+                Width = int.Parse(data[1]),
+                Height = int.Parse(data[2]),
+                Path = path
+            };
+        }
+
+        public async Task<ElevationDataFile> SaveDatasetAsync(string path, string name, GeneratorResult result)
         {
             var xw = result.RawElevationData.GetLength(0);
             var yw = result.RawElevationData.GetLength(1);
@@ -144,6 +151,14 @@ namespace WorldHeightmap.Client
             };
 
             await File.WriteAllLinesAsync(path, file);
+
+            return new()
+            {
+                Display = name,
+                Width = xw,
+                Height = yw,
+                Path = path
+            };
         }
 
         public async Task SaveGeneratorResultsAsync()
@@ -168,7 +183,9 @@ namespace WorldHeightmap.Client
 
             if (save.SaveDataset)
             {
-                await SaveDatasetAsync(Path.Join(USER_FILES, $"{save.ElevationDatasetName}.whcd"), save.ElevationDatasetName, lastResult);
+                var file = await SaveDatasetAsync(Path.Join(USER_FILES, $"{save.ElevationDatasetName}.whcd"), save.ElevationDatasetName, lastResult);
+                ElevationDataFiles.Add(file);
+                savedElevationBox.Refresh();
             }
 
             if (save.SaveExtraData)
@@ -291,9 +308,9 @@ namespace WorldHeightmap.Client
             var request = builder.Build();
             var result = await _heightmap.GenerateHeightmap(request);
 
-            waterElevation.Value = (decimal)result.WaterHeight;
-            depthElevation.Value = (decimal)result.DepthHeight;
-            abyssElevation.Value = (decimal)result.AbyssHeight;
+            waterElevation.Value = result.WaterHeight < 0 ? 0 : (decimal)result.WaterHeight;
+            depthElevation.Value = result.DepthHeight< 0 ? 0 : (decimal)result.DepthHeight;
+            abyssElevation.Value = result.AbyssHeight < 0 ? 0 : (decimal)result.AbyssHeight;
 
             _ = Task.Run(async () => await DisplayImage(result.Heightmap, request));
             _ = Task.Run(async () => await SaveDatasetAsync(Path.Join(USER_FILES, "Temp.whcd"), "[TEMP] Last Dataset Run", result));
