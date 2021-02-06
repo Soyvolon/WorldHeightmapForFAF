@@ -77,9 +77,9 @@ namespace WorldHeightmap.Client
             mapHeight.SelectedIndex = 3;
             mapWidth.SelectedIndex = 3;
 
-            var source = new ElevationDataFile();
             ElevationDataFiles = LoadElevationData();
             savedElevationBox.DataSource = ElevationDataFiles;
+            ElevationDataFile source;
             savedElevationBox.DisplayMember = nameof(source.Display);
             savedElevationBox.SelectedIndex = -1;
         }

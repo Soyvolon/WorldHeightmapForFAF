@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace WorldHeightmap.Core.Models
+﻿namespace WorldHeightmap.Core.Models
 {
     public class GeneratorRequest
     {

@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
+using WorldHeightmap.Core.Extensions;
 using WorldHeightmap.Core.Http;
 using WorldHeightmap.Core.Models;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
-using WorldHeightmap.Core.Extensions;
 
 namespace WorldHeightmap.Core.Services
 {

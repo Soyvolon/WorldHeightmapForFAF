@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 using WorldHeightmap.Core.Models;
 
 namespace WorldHeightmap.Core.Services
