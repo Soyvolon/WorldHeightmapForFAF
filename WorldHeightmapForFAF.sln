@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. src", "2. src", "{AC8403
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. sln", "1. sln", "{6D660A81-323F-4049-A223-26AC55CB92CD}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
